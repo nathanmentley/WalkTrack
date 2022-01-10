@@ -1,0 +1,16 @@
+{
+    "name": "name",
+    "userId": "123",
+    "milestones": [
+        {
+            "name": "name",
+            "description": "description",
+            "distance": 10
+        },
+        {
+            "name": "name 2",
+            "description": "description 2",
+            "distance": 20
+        }
+    ]
+}
