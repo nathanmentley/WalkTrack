@@ -20,7 +20,7 @@ namespace WalkTrack.Common.Json;
 
 /// <summary>
 /// </summary>
-internal class JsonArrayBuilder
+public sealed class JsonArrayBuilder
 {
     private readonly IList<JsonObject> _data;
 

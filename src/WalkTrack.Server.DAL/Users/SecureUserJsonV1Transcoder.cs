@@ -17,12 +17,13 @@
 using System.Text.Json.Nodes;
 using WalkTrack.Common.Json;
 using WalkTrack.Common.Resources;
+using WalkTrack.Common.Users;
 
-namespace WalkTrack.Common.Users;
+namespace WalkTrack.Server.DAL.Users;
 
 /// <summary>
 /// </summary>
-internal sealed class SecureUserJsonV1Transcoder : BaseJsonTranscoder<User>, IPersistTranscoder
+internal sealed class SecureUserJsonV1Transcoder : BaseJsonTranscoder<User>, ITranscoder
 {
     private static readonly WalkTrackMediaType _supportedMediaType =
         new WalkTrackMediaTypeBuilder()

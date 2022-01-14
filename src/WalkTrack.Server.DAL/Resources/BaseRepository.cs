@@ -29,12 +29,10 @@ internal abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
     where T: IResource
 {
     private readonly Database _db;
-    private readonly ITranscoderProcessor _transcoderProcessor;
     private readonly CriterionProcessor _criterionProcessor;
 
     protected BaseRepository(
         string dbName,
-        ITranscoderProcessor transcoderProcessor,
         IEnumerable<ICriterionHandler> criterionHandlers
     )
     {
@@ -43,18 +41,12 @@ internal abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
             throw new ArgumentNullException(nameof(dbName));
         }
 
-        if (transcoderProcessor is null)
-        {
-            throw new ArgumentNullException(nameof(transcoderProcessor));
-        }
-
         if (criterionHandlers is null)
         {
             throw new ArgumentNullException(nameof(criterionHandlers));
         }
 
         _db = new Database(dbName);
-        _transcoderProcessor = transcoderProcessor;
         _criterionProcessor = new CriterionProcessor(criterionHandlers);
     }
 
@@ -113,6 +105,12 @@ internal abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
         foreach(Result result in query.Execute().Where(result => result is not null))
         {
             string content = result.GetString("content");
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                continue;
+            }
+
             WalkTrackMediaType mediaType = WalkTrackMediaType.Parse(result.GetString("mediatype"));
 
             T resource = await DecodeResource(content, mediaType, cancellationToken);
@@ -140,6 +138,8 @@ internal abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
 
     protected abstract WalkTrackMediaType GetSupportedMediaType();
 
+    protected abstract ITranscoder GetTranscoder();
+
     protected virtual async Task BuildDocument(
         MutableDocument mutableDocument,
         T resource,
@@ -148,7 +148,7 @@ internal abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
     {
         using MemoryStream memoryStream = new MemoryStream();
 
-        await _transcoderProcessor.Encode(GetSupportedMediaType(), resource, memoryStream, true, cancellationToken);
+        await GetTranscoder().Encode(resource, memoryStream, cancellationToken);
 
         string content = Encoding.UTF8.GetString(memoryStream.ToArray());
 
@@ -177,6 +177,13 @@ internal abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
         writer.Flush();
         memoryStream.Position = 0;
 
-        return await _transcoderProcessor.Decode<T>(mediaType, memoryStream, true, cancellationToken);
+        object instance = await GetTranscoder().Decode(memoryStream, cancellationToken);
+
+        if (instance is T typedInstance)
+        {
+            return typedInstance;
+        }
+
+        throw new Exception("TODO");
     }
 }

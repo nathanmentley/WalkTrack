@@ -34,19 +34,17 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection WithWalkTrackTranscoders(this IServiceCollection collection) =>
         collection
-            .AddSingleton<IWireTranscoder, ApiErrorResponseJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, AuthenticateRequestJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, AuthenticateResponseJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, EntryJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, EntryCollectionJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, GoalCollectionJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, GoalJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, UserJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, UserCollectionJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, CreateUserRequestJsonV1Transcoder>()
-            .AddSingleton<IWireTranscoder, UpdatePasswordRequestJsonV1Transcoder>()
-            .AddSingleton<IPersistTranscoder, EntryJsonV1Transcoder>()
-            .AddSingleton<IPersistTranscoder, GoalJsonV1Transcoder>()
-            .AddSingleton<IPersistTranscoder, SecureUserJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, ApiErrorResponseJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, AuthenticateRequestJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, AuthenticateResponseJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, EntryJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, EntryCollectionJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, GoalCollectionJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, GoalJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, UserJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, UserCollectionJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, CreateUserRequestJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, UpdatePasswordRequestJsonV1Transcoder>()
+
             .AddSingleton<ITranscoderProcessor, TranscoderProcessor>();
 }

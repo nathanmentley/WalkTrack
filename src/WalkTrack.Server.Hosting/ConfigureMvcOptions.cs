@@ -31,13 +31,13 @@ public class ConfigureMvcOptions : IConfigureOptions<MvcOptions>
 {
     private readonly ILogger<ConfigureMvcOptions> _logger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly IEnumerable<IWireTranscoder> _wireTranscoders;
+    private readonly IEnumerable<ITranscoder> _wireTranscoders;
     private readonly IEnumerable<IExceptionHandler> _handlers;
 
     public ConfigureMvcOptions(
         ILogger<ConfigureMvcOptions> logger,
         ILoggerFactory loggerFactory,
-        IEnumerable<IWireTranscoder> wireTranscoders,
+        IEnumerable<ITranscoder> wireTranscoders,
         IEnumerable<IExceptionHandler> handlers
     )
     {

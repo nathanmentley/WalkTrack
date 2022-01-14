@@ -21,8 +21,8 @@ namespace WalkTrack.Client.Entries;
 public interface IEntryClient
 {
     Task<Entry> Fetch(string id, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Entry>> Fetch(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Entry>> Search(CancellationToken cancellationToken = default);
     Task<Entry> Create(Entry entry, CancellationToken cancellationToken = default);
-    Task<Entry> Update(Entry entry, CancellationToken cancellationToken = default);
+    Task Update(Entry entry, CancellationToken cancellationToken = default);
     Task Delete(Entry entry, CancellationToken cancellationToken = default);
 }

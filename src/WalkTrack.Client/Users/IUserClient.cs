@@ -14,8 +14,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using WalkTrack.Common.Users;
+
 namespace WalkTrack.Client.Users;
 
 public interface IUserClient
 {
+    Task<User> Fetch(string id, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<User>> Search(CancellationToken cancellationToken = default);
+
+    Task<User> Create(CreateUserRequest request, CancellationToken cancellationToken = default);
+
+    Task Update(User user, CancellationToken cancellationToken = default);
+
+    Task UpdatePassword(UpdatePasswordRequest request, CancellationToken cancellationToken = default);
+
+    Task Delete(User user, CancellationToken cancellationToken = default);
 }

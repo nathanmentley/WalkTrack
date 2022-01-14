@@ -20,25 +20,19 @@ namespace WalkTrack.Common.Resources;
 /// </summary>
 internal sealed class TranscoderProcessor: ITranscoderProcessor
 {
-    private readonly IEnumerable<IWireTranscoder> _wireTranscoders;
-    private readonly IEnumerable<IPersistTranscoder> _persistTranscoders;
+    private readonly IEnumerable<ITranscoder> _transcoders;
 
     public TranscoderProcessor(
-        IEnumerable<IWireTranscoder> wireTranscoders,
-        IEnumerable<IPersistTranscoder> persistTranscoders
+        IEnumerable<ITranscoder> transcoders
     )
     {
-        _wireTranscoders = wireTranscoders ??
-            throw new ArgumentNullException(nameof(wireTranscoders));
-
-        _persistTranscoders = persistTranscoders ??
-            throw new ArgumentNullException(nameof(persistTranscoders));
+        _transcoders = transcoders ??
+            throw new ArgumentNullException(nameof(transcoders));
     }
 
     public async Task<T> Decode<T>(
         WalkTrackMediaType mediaType,
         Stream stream,
-        bool forPersistence,
         CancellationToken cancellationToken
     )
     {
@@ -54,7 +48,7 @@ internal sealed class TranscoderProcessor: ITranscoderProcessor
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        ITranscoder? transcoder = GetTranscoder<T>(mediaType, forPersistence);
+        ITranscoder? transcoder = GetTranscoder<T>(mediaType);
 
         if (transcoder is not null)
         {
@@ -75,7 +69,6 @@ internal sealed class TranscoderProcessor: ITranscoderProcessor
         WalkTrackMediaType mediaType,
         T instance,
         Stream stream,
-        bool forPersistence,
         CancellationToken cancellationToken
     )
     {
@@ -96,7 +89,7 @@ internal sealed class TranscoderProcessor: ITranscoderProcessor
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        ITranscoder? transcoder = GetTranscoder<T>(mediaType, forPersistence);
+        ITranscoder? transcoder = GetTranscoder<T>(mediaType);
 
         if (transcoder is not null)
         {
@@ -108,19 +101,9 @@ internal sealed class TranscoderProcessor: ITranscoderProcessor
         }
     }
 
-    private ITranscoder? GetTranscoder<T>(WalkTrackMediaType mediaType, bool forPersistence)
+    private ITranscoder? GetTranscoder<T>(WalkTrackMediaType mediaType)
     {
-        if (forPersistence)
-        {
-            return _persistTranscoders
-                .FirstOrDefault(
-                    transcoder =>
-                        transcoder.CanHandle(mediaType) &&
-                        transcoder.CanHandle(typeof(T))
-                );
-        }
-
-        return _wireTranscoders
+        return _transcoders
             .FirstOrDefault(
                 transcoder =>
                     transcoder.CanHandle(mediaType) &&

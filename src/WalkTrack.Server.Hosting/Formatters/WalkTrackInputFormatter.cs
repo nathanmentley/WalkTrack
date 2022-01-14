@@ -27,7 +27,7 @@ namespace WalkTrack.Server.Hosting.Formatters;
 /// </summary>
 public class WalkTrackInputFormatter: TextInputFormatter
 {
-    private readonly IEnumerable<IWireTranscoder> _dataCodecs;
+    private readonly IEnumerable<ITranscoder> _dataCodecs;
     private readonly ILogger _logger;
 
     /// <summary>
@@ -35,7 +35,7 @@ public class WalkTrackInputFormatter: TextInputFormatter
     /// </summary>
     public WalkTrackInputFormatter(
         ILogger logger,
-        IEnumerable<IWireTranscoder> dataCodecs
+        IEnumerable<ITranscoder> dataCodecs
     )
     {
         _logger = logger ??
@@ -86,7 +86,7 @@ public class WalkTrackInputFormatter: TextInputFormatter
 
         WalkTrackMediaType mediaType = WalkTrackMediaType.Parse(context.HttpContext.Request.ContentType);
 
-        IWireTranscoder? codec = _dataCodecs.FirstOrDefault(codec => codec.CanHandle(mediaType));
+        ITranscoder? codec = _dataCodecs.FirstOrDefault(codec => codec.CanHandle(mediaType));
 
         if (codec is null)
         {

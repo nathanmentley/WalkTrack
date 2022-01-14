@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Users;
 
 /// <summary>
 /// </summary>
-internal sealed class CreateUserRequestJsonV1Transcoder : BaseJsonTranscoder<CreateUserRequest>, IWireTranscoder
+internal sealed class CreateUserRequestJsonV1Transcoder : BaseJsonTranscoder<CreateUserRequest>, ITranscoder
 {
     private static readonly WalkTrackMediaType _supportedMediaType =
         new WalkTrackMediaTypeBuilder()

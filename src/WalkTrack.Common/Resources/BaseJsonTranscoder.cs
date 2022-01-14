@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Resources;
 
 /// <summary>
 /// </summary>
-internal abstract class BaseJsonTranscoder<T>: ITranscoder
+public abstract class BaseJsonTranscoder<T>: ITranscoder
 {
     public bool CanHandle(WalkTrackMediaType mediaType) =>
         GetSupportedMediaType().Equals(mediaType);

@@ -22,7 +22,7 @@ namespace WalkTrack.Common.ApiErrorResponses;
 
 /// <summary>
 /// </summary>
-internal sealed class ApiErrorResponseJsonV1Transcoder: BaseJsonTranscoder<ApiErrorResponse>, IWireTranscoder
+internal sealed class ApiErrorResponseJsonV1Transcoder: BaseJsonTranscoder<ApiErrorResponse>, ITranscoder
 {
     private static readonly WalkTrackMediaType _supportedMediaType =
         new WalkTrackMediaTypeBuilder()

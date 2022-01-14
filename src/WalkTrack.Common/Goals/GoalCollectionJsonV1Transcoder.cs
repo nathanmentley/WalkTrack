@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Goals;
 
 /// <summary>
 /// </summary>
-internal sealed class GoalCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumerable<Goal>>, IWireTranscoder
+internal sealed class GoalCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumerable<Goal>>, ITranscoder
 {
     private readonly GoalJsonV1Transcoder _goalTranscoder;
     
@@ -55,9 +55,7 @@ internal sealed class GoalCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumer
 
     public override IEnumerable<Goal> Decode(JsonObject jsonObject)
     {
-        JsonArray array = GetValue<JsonArray>(jsonObject, "data", new JsonArray());
-
-        foreach(JsonObject? goal in array)
+        foreach(JsonObject? goal in jsonObject["data"]?.AsArray() ?? new JsonArray())
         {
             if (goal is not null)
             {

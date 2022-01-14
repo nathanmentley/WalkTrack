@@ -31,7 +31,7 @@ internal sealed class UserRepository: BaseRepository<User>, IUserRepository
             new UsernameCriterionHandler()
         };
 
-    private static readonly WalkTrackMediaType _supportedMediaType =
+    private static readonly WalkTrackMediaType SupportedMediaType =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
             .WithSubType(WalkTrackMediaTypeSubTypes.Json)
@@ -39,11 +39,17 @@ internal sealed class UserRepository: BaseRepository<User>, IUserRepository
             .WithVersion(1)
             .Build();
 
-    public UserRepository(ITranscoderProcessor transcoderProcessor):
-        base("userdb", transcoderProcessor, CriterionHandlers) {}
+    private static readonly ITranscoder Transcoder =
+        new SecureUserJsonV1Transcoder();
+
+    public UserRepository():
+        base("userdb", CriterionHandlers) {}
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
-        _supportedMediaType;
+        SupportedMediaType;
+
+    protected override ITranscoder GetTranscoder() =>
+        Transcoder;
 
     protected override async Task BuildDocument(
         MutableDocument mutableDocument,

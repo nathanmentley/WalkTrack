@@ -14,24 +14,112 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Flurl;
+using WalkTrack.Client.Authentications;
 using WalkTrack.Common.Entries;
+using WalkTrack.Common.Resources;
 
 namespace WalkTrack.Client.Entries;
 
-internal sealed class EntryClient: IEntryClient
+internal sealed class EntryClient: BaseClient, IEntryClient
 {
-    public Task<Entry> Fetch(string id, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    private readonly ITranscoderProcessor _transcoder;
+    private readonly HttpClient _httpClient;
 
-    public Task<IEnumerable<Entry>> Fetch(CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    private static readonly WalkTrackMediaType _entryMediaType =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Entry")
+            .WithVersion(1)
+            .Build();
 
-    public Task<Entry> Create(Entry entry, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    private static readonly WalkTrackMediaType _entriesMediaType =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Entries")
+            .WithVersion(1)
+            .Build();
 
-    public Task<Entry> Update(Entry entry, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public EntryClient(ITranscoderProcessor transcoder)
+    {
+        _transcoder = transcoder ??
+            throw new ArgumentNullException(nameof(transcoder));
 
-    public Task Delete(Entry entry, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        _httpClient = new HttpClient()
+        {
+            BaseAddress = new Uri("http://localhost:8000")
+        };
+    }
+
+    public async Task<Entry> Fetch(string id, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithMethod(HttpMethod.Get)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("entry")
+                    .AppendPathSegment(id)
+            )
+            .WithAcceptType(_entryMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Fetch<Entry>(_httpClient, cancellationToken);
+
+    public async Task<IEnumerable<Entry>> Search(CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithMethod(HttpMethod.Get)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("entry")
+            )
+            .WithAcceptType(_entriesMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Fetch<IEnumerable<Entry>>(_httpClient, cancellationToken);
+
+    public async Task<Entry> Create(Entry entry, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(entry)
+            .WithContentTypes(_entryMediaType)
+            .WithMethod(HttpMethod.Post)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("entry")
+            )
+            .WithAcceptType(_entryMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Fetch<Entry, Entry>(_httpClient, cancellationToken);
+
+    public async Task Update(Entry entry, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(entry)
+            .WithContentTypes(_entryMediaType)
+            .WithMethod(HttpMethod.Put)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("entry")
+            )
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Send<Entry>(_httpClient, cancellationToken);
+
+    public async Task Delete(Entry entry, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithMethod(HttpMethod.Delete)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("entry")
+                    .AppendPathSegment(entry.Id)
+            )
+            .WithAcceptType(_entryMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Send(_httpClient, cancellationToken);
 }

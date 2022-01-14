@@ -1,0 +1,112 @@
+@*
+    WalkTrack - A simple walk tracker that lets people define their own milestones
+
+    Copyright (C) 2022  Nathan Mentley
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*@
+
+@page "/account/login"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IAuthenticationClient AuthenticationClient
+@inject ILocalStorageService LocalStorageService
+
+<div class="card">
+    <h4 class="card-header">Login</h4>
+    <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="container">
+                <div class="row">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <InputText @bind-Value="model.Username" class="form-control" />
+                        <ValidationMessage For="@(() => model.Username)" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <InputText @bind-Value="model.Password" type="password" class="form-control" />
+                        <ValidationMessage For="@(() => model.Password)" />
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <button disabled="@model.Loading" class="btn btn-primary">
+                        @if (model.Loading) 
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Login
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+        
+        <NavLink href="account/register" class="btn btn-link">Register</NavLink>
+    </div>
+</div>
+
+@code {
+    private class LoginModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public bool Loading { get; set; } = false;
+
+        public AuthenticateRequest ToLoginRequest() =>
+            new AuthenticateRequest()
+            {
+                Username = Username,
+                Password = Password
+            };
+    }
+    private LoginModel model = new LoginModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService))
+        {
+            NavigationManager.NavigateTo("");
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        model.Loading = true;
+
+        try
+        {
+            AuthenticateResponse response = await AuthenticationClient.Login(model.ToLoginRequest());
+
+            await AppState.PersistToken(LocalStorageService, response.Token);
+
+            NavigationManager.NavigateTo("");
+        }
+        catch(ResourceNotFoundException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "Login failed");
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
+        finally
+        {
+            model.Loading = false;
+
+            StateHasChanged();
+        }
+    }
+}

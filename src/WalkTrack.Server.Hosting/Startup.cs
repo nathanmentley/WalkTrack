@@ -64,12 +64,19 @@ public class Startup
 
             .AddSingleton<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>()
 
-            .AddControllers();
+            .AddCors(options =>
+                options.AddDefaultPolicy(
+                    builder =>
+                        builder
+                            .WithOrigins("*")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                )
+            )
 
-        services.Configure<KestrelServerOptions>(options =>
-        {
-            options.AllowSynchronousIO = true;
-        });
+            .Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true)
+
+            .AddControllers();
     }
 
     /// <summary>
@@ -85,6 +92,7 @@ public class Startup
         app
             .UseRouting()
             .UseMiddleware<JwtMiddleware>()
+            .UseCors()
             .UseEndpoints(
                 endpoints =>
                 {

@@ -1,0 +1,181 @@
+﻿@*
+    WalkTrack - A simple walk tracker that lets people define their own milestones
+
+    Copyright (C) 2022  Nathan Mentley
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*@
+
+@page "/entries"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IAuthenticationClient AuthenticationClient
+@inject IEntryClient EntryClient
+@inject ILocalStorageService LocalStorageService
+
+<PageTitle>Entries</PageTitle>
+
+<h1>Entries</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <p role="status">Entries: @model.Entries.Count()</p>
+        </div>
+        <div class="col">
+            <p role="status">Distance: @model.Entries.Sum(entry => entry.Distance)</p>
+        </div>
+    </div>
+</div>
+
+<p @onclick="() => { model.Collapsed = !model.Collapsed;}">
+    <span class="oi oi-plus"></span> Add New Entry
+</p>
+
+<div class="@(model.Collapsed ? "collapse": "")">
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="container">
+            <div class="row">
+                <div class="form-group">
+                    <label>Date</label>
+                    <InputDate @bind-Value="model.Date" class="form-control" />
+                    <ValidationMessage For="@(() => model.Date)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Distance</label>
+                    <InputNumber @bind-Value="model.Distance" class="form-control" />
+                    <ValidationMessage For="@(() => model.Distance)" />
+                </div>
+            </div>
+            <div class="row p-3">
+                <button disabled="@model.Loading" class="btn btn-primary">
+                    @if (model.Loading) 
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-plus"></span> Add Entry
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Distance</th>
+            <th>Controls</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Entry entry in model.Entries.OrderByDescending(entry => entry.Date))
+        {
+            <tr>
+                <td>@entry.Date</td>
+                <td>@entry.Distance</td>
+                <td>
+                    <a @onclick="() => OnDelete(entry)"><span class="oi oi-trash"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private class EntryModel
+    {
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public decimal Distance { get; set; } = 0;
+
+        public bool Collapsed { get; set; } = true;
+        public bool Loading { get; set; } = false;
+
+        public IEnumerable<Entry> Entries { get; private set; } = Enumerable.Empty<Entry>();
+
+        public void SetEntries(IEnumerable<Entry> entries)
+        {
+            Entries = entries;
+        }
+
+        public Entry ToEntry() =>
+            new Entry()
+            {
+                Date = Date,
+                Distance = Distance
+            };
+    }
+    private readonly EntryModel model = new EntryModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+        else
+        {
+            await ReloadEntires();
+        }
+    }
+
+    private async Task OnDelete(Entry entry)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this entry?"))
+        {
+            try
+            {
+                await EntryClient.Delete(entry);
+            }
+            catch(UnhandledResponseErrorException)
+            {
+                await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+            }
+
+            await ReloadEntires();
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        model.Loading = true;
+
+        try
+        {
+            await EntryClient.Create(model.ToEntry());
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
+
+        await ReloadEntires();
+
+        model.Collapsed = true;
+        model.Loading = false;
+    }
+
+    private async Task ReloadEntires()
+    {
+        try
+        {
+            model.SetEntries(await EntryClient.Search());
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
+    }
+}

@@ -14,10 +14,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace WalkTrack.Common.Resources;
+using WalkTrack.Common.ApiErrorResponses;
 
-/// <summary>
-/// </summary>
-public interface IPersistTranscoder: ITranscoder
+namespace WalkTrack.Client;
+
+internal interface IErrorHandler
 {
+    bool CanHandle(ApiErrorResponse apiError);
+    Exception Handle(ApiErrorResponse apiError);
 }

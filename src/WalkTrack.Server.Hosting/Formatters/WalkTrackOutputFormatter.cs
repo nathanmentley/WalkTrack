@@ -30,10 +30,10 @@ namespace WalkTrack.Server.Hosting.Formatters;
 /// </typeparam>
 public class WalkTrackOutputFormatter: TextOutputFormatter
 {
-    private readonly static IWireTranscoder _nullTranscoder =
+    private readonly static ITranscoder _nullTranscoder =
         new NullTranscoder();
 
-    private readonly IEnumerable<IWireTranscoder> _codecs;
+    private readonly IEnumerable<ITranscoder> _codecs;
 
     private readonly ILogger _logger;
 
@@ -42,7 +42,7 @@ public class WalkTrackOutputFormatter: TextOutputFormatter
     /// </summary>
     public WalkTrackOutputFormatter(
         ILogger logger,
-        IEnumerable<IWireTranscoder> codecs
+        IEnumerable<ITranscoder> codecs
     )
     {
         _logger = logger ??
@@ -89,15 +89,15 @@ public class WalkTrackOutputFormatter: TextOutputFormatter
         }
 
         IEnumerable<WalkTrackMediaType> acceptTypes =
-            context.HttpContext.Request.Headers.Accept.Select(
-                accept => WalkTrackMediaType.Parse(accept)
-            );
+            context.HttpContext.Request.Headers.Accept
+                .SelectMany(accepts => accepts.Split(",").Select(accept => accept.Trim()))
+                .Select(accept => WalkTrackMediaType.Parse(accept));
 
         if (
             !CanHandleResponse(
                 context.ObjectType,
-                context.HttpContext.Request.Headers.Accept,
-                out IWireTranscoder codec,
+                acceptTypes,
+                out ITranscoder codec,
                 out string acceptType)
             )
         {
@@ -127,19 +127,19 @@ public class WalkTrackOutputFormatter: TextOutputFormatter
     protected override bool CanWriteType(Type? type) =>
         _codecs.Any(codec => type is not null && codec.CanHandle(type));
 
-    private bool CanHandleResponse(Type type, IEnumerable<string> acceptTypes, out IWireTranscoder transcoder, out string mediaType)
+    private bool CanHandleResponse(Type type, IEnumerable<WalkTrackMediaType> acceptTypes, out ITranscoder transcoder, out string mediaType)
     {
         transcoder = _nullTranscoder;
         mediaType = string.Empty;
 
-        foreach(string acceptType in acceptTypes)
+        foreach(WalkTrackMediaType acceptType in acceptTypes)
         {
-            foreach(IWireTranscoder codec in _codecs)
+            foreach(ITranscoder codec in _codecs)
             {
-                if (codec.CanHandle(type) && codec.CanHandle(WalkTrackMediaType.Parse(acceptType)))
+                if (codec.CanHandle(type) && codec.CanHandle(acceptType))
                 {
                     transcoder = codec;
-                    mediaType = acceptType;
+                    mediaType = acceptType.ToString();
 
                     return true;
                 }

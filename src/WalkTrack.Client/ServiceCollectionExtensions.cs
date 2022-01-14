@@ -16,6 +16,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using WalkTrack.Client.Authentications;
 using WalkTrack.Client.Entries;
 using WalkTrack.Client.Goals;
 using WalkTrack.Client.Users;
@@ -31,6 +32,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection WithWalkTrackClient(this IServiceCollection collection) =>
         collection
+            .AddSingleton<IAuthenticationClient, AuthenticationClient>()
             .AddSingleton<IEntryClient, EntryClient>()
             .AddSingleton<IGoalClient, GoalClient>()
             .AddSingleton<IUserClient, UserClient>();

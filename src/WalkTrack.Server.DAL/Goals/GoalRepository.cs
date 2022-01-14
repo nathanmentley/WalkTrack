@@ -19,6 +19,7 @@ using WalkTrack.Common.Goals;
 using WalkTrack.Common.Resources;
 using WalkTrack.Server.DAL.Criteria.Core;
 using WalkTrack.Server.DAL.Resources;
+using WalkTrack.Server.DAL.Users;
 using WalkTrack.Server.Goals;
 
 namespace WalkTrack.Server.DAL.Goals;
@@ -31,19 +32,25 @@ internal sealed class GoalRepository: BaseRepository<Goal>, IGoalRepository
             new UserIdCriterionHandler()
         };
 
-    private static readonly WalkTrackMediaType _supportedMediaType =
+    private static readonly WalkTrackMediaType SupportedMediaType =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
             .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.Goal")
+            .WithStructure("WalkTrack.SecureGoal")
             .WithVersion(1)
             .Build();
 
-    public GoalRepository(ITranscoderProcessor transcoderProcessor):
-        base("goaldb", transcoderProcessor, CriterionHandlers) {}
+    private static readonly ITranscoder Transcoder =
+        new SecureGoalJsonV1Transcoder();
+
+    public GoalRepository():
+        base("goaldb", CriterionHandlers) {}
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
-        _supportedMediaType;
+        SupportedMediaType;
+
+    protected override ITranscoder GetTranscoder() =>
+        Transcoder;
 
     protected override async Task BuildDocument(
         MutableDocument mutableDocument,

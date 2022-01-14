@@ -23,7 +23,6 @@ public interface ITranscoderProcessor
     Task<T> Decode<T>(
         WalkTrackMediaType mediaType,
         Stream stream,
-        bool forPersistence,
         CancellationToken cancellationToken
     );
 
@@ -31,7 +30,6 @@ public interface ITranscoderProcessor
         WalkTrackMediaType mediaType,
         T instance,
         Stream stream,
-        bool forPersistence,
         CancellationToken cancellationToken
     );
 }

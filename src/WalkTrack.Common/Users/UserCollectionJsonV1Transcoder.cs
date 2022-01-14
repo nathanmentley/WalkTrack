@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Users;
 
 /// <summary>
 /// </summary>
-internal sealed class UserCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumerable<User>>, IWireTranscoder
+internal sealed class UserCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumerable<User>>, ITranscoder
 {
     private readonly UserJsonV1Transcoder _userTranscoder;
     
@@ -55,9 +55,7 @@ internal sealed class UserCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumer
 
     public override IEnumerable<User> Decode(JsonObject jsonObject)
     {
-        JsonArray array = GetValue<JsonArray>(jsonObject, "data", new JsonArray());
-
-        foreach(JsonObject? user in array)
+        foreach(JsonObject? user in jsonObject["data"]?.AsArray() ?? new JsonArray())
         {
             if (user is not null)
             {

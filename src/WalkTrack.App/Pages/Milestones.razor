@@ -1,0 +1,193 @@
+﻿@*
+    WalkTrack - A simple walk tracker that lets people define their own milestones
+
+    Copyright (C) 2022  Nathan Mentley
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*@
+
+@page "/goals/{GoalId}/milestones"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IAuthenticationClient AuthenticationClient
+@inject IGoalClient GoalClient 
+@inject ILocalStorageService LocalStorageService
+
+<PageTitle>@model.Goal.Name Milestones</PageTitle>
+
+<h1>Milestones</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <p role="status">@model.Goal.Name</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p role="status">Milestones: @model.Goal.Milestones.Count()</p>
+        </div>
+    </div>
+</div>
+
+<p @onclick="() => { model.Collapsed = !model.Collapsed;}">
+    <span class="oi oi-plus"></span> Add New Milestone
+</p>
+
+<div class="@(model.Collapsed ? "collapse": "")">
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="container">
+            <div class="row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <InputText @bind-Value="model.Name" class="form-control" />
+                    <ValidationMessage For="@(() => model.Name)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Description</label>
+                    <InputText @bind-Value="model.Description" class="form-control" />
+                    <ValidationMessage For="@(() => model.Description)" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <label>Distance</label>
+                    <InputNumber @bind-Value="model.Distance" class="form-control" />
+                    <ValidationMessage For="@(() => model.Distance)" />
+                </div>
+            </div>
+            <div class="row p-3">
+                <button disabled="@model.Loading" class="btn btn-primary">
+                    @if (model.Loading) 
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-plus"></span> Add Milestone
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Distance</th>
+            <th>Controls</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Milestone milestone in model.Goal.Milestones.OrderBy(milestone => milestone.Distance))
+        {
+            <tr>
+                <td>@milestone.Name</td>
+                <td>@milestone.Description</td>
+                <td>@milestone.Distance</td>
+                <td>
+                    <a @onclick="() => OnDelete(milestone)"><span class="oi oi-trash"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private class MilestoneModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Distance { get; set; } = decimal.Zero;
+
+        public Goal Goal { get; set; } = new Goal();
+
+        public bool Collapsed { get; set; } = true;
+        public bool Loading { get; set; } = false;
+
+        public Milestone ToMilestone() =>
+            new Milestone()
+            {
+                Name = Name,
+                Description = Description,
+                Distance = Distance
+            };
+    }
+    private readonly MilestoneModel model = new MilestoneModel();
+
+    [Parameter]
+    public string GoalId { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+        else
+        {
+            await ReloadMilestones();
+        }
+    }
+
+    private async Task OnDelete(Milestone milestone)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this milestone?"))
+        {
+            model.Goal = model.Goal with { Milestones = model.Goal.Milestones.Where(m => m != milestone) };
+
+            try
+            {
+                await GoalClient.Update(model.Goal);
+            }
+            catch(UnhandledResponseErrorException)
+            {
+                await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+            }
+
+            await ReloadMilestones();
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        model.Loading = true;
+
+        try
+        {
+            List<Milestone> milestones = new List<Milestone>();
+            milestones.AddRange(model.Goal.Milestones);
+            milestones.Add(model.ToMilestone());
+
+            model.Goal = model.Goal with { Milestones = milestones };
+
+            await GoalClient.Update(model.Goal);
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
+
+        await ReloadMilestones();
+
+        model.Collapsed = true;
+        model.Loading = false;
+    }
+
+    private async Task ReloadMilestones()
+    {
+        model.Goal = await GoalClient.Fetch(GoalId);
+    }
+}

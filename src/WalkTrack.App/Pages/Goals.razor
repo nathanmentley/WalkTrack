@@ -1,0 +1,168 @@
+﻿@*
+    WalkTrack - A simple walk tracker that lets people define their own milestones
+
+    Copyright (C) 2022  Nathan Mentley
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*@
+
+@page "/goals"
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IAuthenticationClient AuthenticationClient
+@inject IGoalClient GoalClient
+@inject ILocalStorageService LocalStorageService
+
+<PageTitle>Goals</PageTitle>
+
+<h1>Goals</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <p role="status">Goals: @model.Goals.Count()</p>
+        </div>
+    </div>
+</div>
+
+<p @onclick="() => { model.Collapsed = !model.Collapsed;}">
+    <span class="oi oi-plus"></span> Add New Goal
+</p>
+
+<div class="@(model.Collapsed ? "collapse": "")">
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        
+        <div class="container">
+            <div class="row">
+                <div class="form-group">
+                    <label>Name</label>
+                    <InputText @bind-Value="model.Name" class="form-control" />
+                    <ValidationMessage For="@(() => model.Name)" />
+                </div>
+            </div>
+            <div class="row p-3">
+                <button disabled="@model.Loading" class="btn btn-primary">
+                    @if (model.Loading) 
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    <span class="oi oi-plus"></span> Add Goal
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Controls</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Goal goal in model.Goals)
+        {
+            <tr>
+                <td>@goal.Name</td>
+                <td>
+                    <NavLink href="@($"/goals/{goal.Id}/milestones")"><span class="oi oi-pencil"></span></NavLink>
+                    <a @onclick="() => OnDelete(goal)"><span class="oi oi-trash"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private class GoalModel
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public bool Collapsed { get; set; } = true;
+        public bool Loading { get; set; } = false;
+
+        public IEnumerable<Goal> Goals { get; private set; } = Enumerable.Empty<Goal>();
+
+        public void SetGoals(IEnumerable<Goal> goals)
+        {
+            Goals = goals;
+        }
+
+        public Goal ToGoal() =>
+            new Goal()
+            {
+                Name = Name
+            };
+    }
+    private readonly GoalModel model = new GoalModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+        else
+        {
+            await ReloadGoals();
+        }
+    }
+
+    private async Task OnDelete(Goal goal)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this goal?"))
+        {
+            try
+            {
+                await GoalClient.Delete(goal);
+            }
+            catch(UnhandledResponseErrorException)
+            {
+                await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+            }
+
+            await ReloadGoals();
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        model.Loading = true;
+
+        try
+        {
+            await GoalClient.Create(model.ToGoal());
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
+
+        await ReloadGoals();
+
+        model.Collapsed = true;
+        model.Loading = false;
+    }
+
+    private async Task ReloadGoals()
+    {
+        try
+        {
+            model.SetGoals(await GoalClient.Search());
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
+    }
+}

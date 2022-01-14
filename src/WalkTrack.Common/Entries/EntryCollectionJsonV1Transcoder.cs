@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Entries;
 
 /// <summary>
 /// </summary>
-internal sealed class EntryCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumerable<Entry>>, IWireTranscoder
+internal sealed class EntryCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnumerable<Entry>>, ITranscoder
 {
     private readonly EntryJsonV1Transcoder _entryTranscoder;
     
@@ -55,9 +55,7 @@ internal sealed class EntryCollectionJsonV1Transcoder: BaseJsonTranscoder<IEnume
 
     public override IEnumerable<Entry> Decode(JsonObject jsonObject)
     {
-        JsonArray array = GetValue<JsonArray>(jsonObject, "data", new JsonArray());
-
-        foreach(JsonObject? entry in array)
+        foreach(JsonObject? entry in jsonObject["data"]?.AsArray() ?? new JsonArray())
         {
             if (entry is not null)
             {

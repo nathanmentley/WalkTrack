@@ -14,24 +14,112 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Flurl;
+using WalkTrack.Client.Authentications;
 using WalkTrack.Common.Goals;
+using WalkTrack.Common.Resources;
 
 namespace WalkTrack.Client.Goals;
 
-internal sealed class GoalClient: IGoalClient
+internal sealed class GoalClient: BaseClient, IGoalClient
 {
-    public Task<Goal> Fetch(string id, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    private readonly ITranscoderProcessor _transcoder;
+    private readonly HttpClient _httpClient;
 
-    public Task<IEnumerable<Goal>> Fetch(CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    private static readonly WalkTrackMediaType _goalMediaType =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Goal")
+            .WithVersion(1)
+            .Build();
 
-    public Task<Goal> Create(Goal goal, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    private static readonly WalkTrackMediaType _goalsMediaType =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Goals")
+            .WithVersion(1)
+            .Build();
 
-    public Task<Goal> Update(Goal goal, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+    public GoalClient(ITranscoderProcessor transcoder)
+    {
+        _transcoder = transcoder ??
+            throw new ArgumentNullException(nameof(transcoder));
 
-    public Task Delete(Goal goal, CancellationToken cancellationToken = default) =>
-        throw new NotImplementedException();
+        _httpClient = new HttpClient()
+        {
+            BaseAddress = new Uri("http://localhost:8000")
+        };
+    }
+
+    public async Task<Goal> Fetch(string id, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithMethod(HttpMethod.Get)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("goal")
+                    .AppendPathSegment(id)
+            )
+            .WithAcceptType(_goalMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Fetch<Goal>(_httpClient, cancellationToken);
+
+    public async Task<IEnumerable<Goal>> Search(CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithMethod(HttpMethod.Get)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("goal")
+            )
+            .WithAcceptType(_goalsMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Fetch<IEnumerable<Goal>>(_httpClient, cancellationToken);
+
+    public async Task<Goal> Create(Goal goal, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(goal)
+            .WithContentTypes(_goalMediaType)
+            .WithMethod(HttpMethod.Post)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("goal")
+            )
+            .WithAcceptType(_goalMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Fetch<Goal, Goal>(_httpClient, cancellationToken);
+
+    public async Task Update(Goal goal, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(goal)
+            .WithContentTypes(_goalMediaType)
+            .WithMethod(HttpMethod.Put)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("goal")
+            )
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Send<Goal>(_httpClient, cancellationToken);
+
+    public async Task Delete(Goal goal, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithMethod(HttpMethod.Delete)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("goal")
+                    .AppendPathSegment(goal.Id)
+            )
+            .WithAcceptType(_goalMediaType)
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthToken(AuthenticationContext.Token)
+            .Send(_httpClient, cancellationToken);
 }

@@ -14,10 +14,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace WalkTrack.Common.Resources;
+namespace WalkTrack.Client;
 
-/// <summary>
-/// </summary>
-public interface IWireTranscoder: ITranscoder
+internal abstract class BaseClient
 {
 }

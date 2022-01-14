@@ -31,19 +31,25 @@ internal sealed class EntryRepository: BaseRepository<Entry>, IEntryRepository
             new UserIdCriterionHandler()
         };
 
-    private static readonly WalkTrackMediaType _supportedMediaType =
+    private static readonly WalkTrackMediaType SupportedMediaType =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
             .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.Entry")
+            .WithStructure("WalkTrack.SecureEntry")
             .WithVersion(1)
             .Build();
 
-    public EntryRepository(ITranscoderProcessor transcoderProcessor):
-        base("entrydb", transcoderProcessor, CriterionHandlers) {}
+    private static readonly ITranscoder Transcoder =
+        new EntryJsonV1Transcoder();
+
+    public EntryRepository():
+        base("entrydb", CriterionHandlers) {}
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
-        _supportedMediaType;
+        SupportedMediaType;
+
+    protected override ITranscoder GetTranscoder() =>
+        Transcoder;
 
     protected override async Task BuildDocument(
         MutableDocument mutableDocument,

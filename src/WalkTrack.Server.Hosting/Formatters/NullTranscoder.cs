@@ -18,7 +18,7 @@ using WalkTrack.Common.Resources;
 
 namespace WalkTrack.Server.Hosting.Formatters;
 
-public class NullTranscoder : IWireTranscoder
+public class NullTranscoder : ITranscoder
 {
     public bool CanHandle(WalkTrackMediaType mediaType) => false;
 

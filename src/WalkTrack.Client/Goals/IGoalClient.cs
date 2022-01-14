@@ -22,11 +22,11 @@ public interface IGoalClient
 {
     Task<Goal> Fetch(string id, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Goal>> Fetch(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Goal>> Search(CancellationToken cancellationToken = default);
 
     Task<Goal> Create(Goal goal, CancellationToken cancellationToken = default);
 
-    Task<Goal> Update(Goal goal, CancellationToken cancellationToken = default);
+    Task Update(Goal goal, CancellationToken cancellationToken = default);
 
     Task Delete(Goal goal, CancellationToken cancellationToken = default);
 }

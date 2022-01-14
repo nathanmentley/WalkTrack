@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Goals;
 
 /// <summary>
 /// </summary>
-internal sealed class GoalJsonV1Transcoder: BaseJsonTranscoder<Goal>, IWireTranscoder, IPersistTranscoder
+internal sealed class GoalJsonV1Transcoder: BaseJsonTranscoder<Goal>, ITranscoder
 {
     private static readonly WalkTrackMediaType _supportedMediaType =
         new WalkTrackMediaTypeBuilder()

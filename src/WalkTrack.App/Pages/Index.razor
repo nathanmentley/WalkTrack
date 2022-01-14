@@ -1,0 +1,77 @@
+﻿@*
+    WalkTrack - A simple walk tracker that lets people define their own milestones
+
+    Copyright (C) 2022  Nathan Mentley
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*@
+
+@page "/"
+
+@inject NavigationManager NavigationManager
+@inject IAuthenticationClient AuthenticationClient
+@inject IEntryClient EntryClient
+@inject IGoalClient GoalClient
+@inject ILocalStorageService LocalStorageService
+
+<PageTitle>Index</PageTitle>
+
+<h1>@model.Goal.Name</h1>
+
+<p>Ran @model.Distance miles of @model.FinishLine</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Distance</th>
+            <th>%</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Milestone milestone in model.Goal.Milestones.OrderBy(milestone => milestone.Distance))
+        {
+            <tr>
+                <td>@milestone.Name</td>
+                <td>@milestone.Distance</td>
+                <td>@(milestone.Distance < model.Distance ? "100%" : String.Format("{0:0%}", model.Distance / milestone.Distance))</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private class IndexModel
+    {
+        public IEnumerable<Goal> Goals { get; set; } = Enumerable.Empty<Goal>();
+        public IEnumerable<Entry> Entries { get; set; } = Enumerable.Empty<Entry>();
+
+        public Goal Goal { get; set; } = new Goal();
+
+        public decimal Distance => Entries.Sum(entry => entry.Distance);
+
+        public decimal FinishLine => Goal.Milestones.Sum(milestone => milestone.Distance);
+    }
+    private readonly IndexModel model = new IndexModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+
+        model.Goals = await GoalClient.Search();
+        model.Entries = await EntryClient.Search();
+
+        model.Goal = model.Goals.FirstOrDefault() ?? new Goal();
+    }
+}

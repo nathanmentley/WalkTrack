@@ -22,7 +22,7 @@ namespace WalkTrack.Common.Authentications;
 
 /// <summary>
 /// </summary>
-internal sealed class AuthenticateResponseJsonV1Transcoder: BaseJsonTranscoder<AuthenticateResponse>, IWireTranscoder
+internal sealed class AuthenticateResponseJsonV1Transcoder: BaseJsonTranscoder<AuthenticateResponse>, ITranscoder
 {
     private static readonly WalkTrackMediaType _supportedMediaType =
         new WalkTrackMediaTypeBuilder()
