@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Framework\WalkTrack.Framework.Server.Hosting\WalkTrack.Framework.Server.Hosting.csproj" />
+
+    <ProjectReference Include="..\WalkTrack.EntryService.Server.Services\WalkTrack.EntryService.Server.Services.csproj" />
+    <ProjectReference Include="..\WalkTrack.EntryService.Server.DAL\WalkTrack.EntryService.Server.DAL.csproj" />
+    <ProjectReference Include="..\WalkTrack.EntryService.Server\WalkTrack.EntryService.Server.csproj" />
+  </ItemGroup>
+
+</Project>
