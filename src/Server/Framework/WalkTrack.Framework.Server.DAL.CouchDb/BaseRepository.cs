@@ -15,8 +15,8 @@
 */
 
 using System.Text;
-using Couchbase.Lite;
-using Couchbase.Lite.Query;
+using CouchDB.Driver;
+using CouchDB.Driver.Extensions;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
@@ -24,15 +24,17 @@ using WalkTrack.Framework.Server.Exceptions;
 
 namespace WalkTrack.Framework.Server.DAL.CouchDb;
 
-public abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
-    where T: IResource
+public abstract class BaseRepository<TResource, TPersisted> : IResourceRepository<TResource>, IAsyncDisposable
+    where TResource: IResource
+    where TPersisted: BasePersistedDocument<TResource>, new()
 {
-    private readonly Database _db;
-    private readonly CriterionProcessor _criterionProcessor;
+    private readonly CriterionProcessor<TPersisted> _criterionProcessor;
+    private readonly CouchClient _client;
+    private readonly string _dbName;
 
     protected BaseRepository(
         string dbName,
-        IEnumerable<ICriterionHandler> criterionHandlers
+        IEnumerable<ICriterionHandler<TPersisted>> criterionHandlers
     )
     {
         if (string.IsNullOrWhiteSpace(dbName))
@@ -45,129 +47,104 @@ public abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
             throw new ArgumentNullException(nameof(criterionHandlers));
         }
 
-        _db = new Database(dbName);
-        _criterionProcessor = new CriterionProcessor(criterionHandlers);
+        _dbName = dbName;
+
+        _criterionProcessor = new CriterionProcessor<TPersisted>(criterionHandlers);
+
+        _client = new CouchClient("http://couchdb:5984", builder => builder
+            .UseBasicAuthentication("admin", "password")
+        );
     }
 
-    public async Task<T> Create(T resource, CancellationToken cancellationToken = default)
+    public async Task<TResource> Create(TResource resource, CancellationToken cancellationToken = default) =>
+        await Update(resource, cancellationToken);
+
+    public async Task Delete(string id, CancellationToken cancellationToken = default)
     {
-        using MutableDocument mutableDocument = new MutableDocument(resource.Id);
+        ICouchDatabase<TPersisted> db = await GetDb(cancellationToken);
 
-        await BuildDocument(mutableDocument, resource, cancellationToken);
+        TPersisted? record = db.FirstOrDefault(x => x.Id == id);
 
-        _db.Save(mutableDocument);
-
-        return resource;
-    }
-
-    public Task Delete(string id, CancellationToken cancellationToken = default)
-    {
-        using Document document = _db.GetDocument(id);
-
-        if (document is not null)
-        {
-            _db.Delete(document);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public async Task<T> Fetch(string id, CancellationToken cancellationToken = default)
-    {
-        using Document document = _db.GetDocument(id);
-
-        if (document is null)
+        if (record is null)
         {
             throw new ResourceNotFoundException();
         }
 
-        string content = document.GetString("content");
-
-        WalkTrackMediaType mediaType = WalkTrackMediaType.Parse(document.GetString("mediatype"));
-
-        return await DecodeResource(content, mediaType, cancellationToken);
+        await db.RemoveAsync(record, false, cancellationToken);
     }
 
-    public async Task<IEnumerable<T>> Search(IEnumerable<ICriterion> criteria, CancellationToken cancellationToken = default)
+    public async Task<TResource> Fetch(string id, CancellationToken cancellationToken = default)
     {
-        IList<T> list = new List<T>();
+        ICouchDatabase<TPersisted> db = await GetDb(cancellationToken);
 
-        IFrom from =
-            QueryBuilder.Select(
-                SelectResult.Property("content"),
-                SelectResult.Property("mediatype")
-            )
-            .From(DataSource.Database(_db));
+        TPersisted? record = db.FirstOrDefault(x => x.Id == id);
 
-        IQuery query = ProcessQuery(from, criteria);
-
-        foreach(Result result in query.Execute().Where(result => result is not null))
+        if (record is null)
         {
-            string content = result.GetString("content");
-
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                continue;
-            }
-
-            WalkTrackMediaType mediaType = WalkTrackMediaType.Parse(result.GetString("mediatype"));
-
-            T resource = await DecodeResource(content, mediaType, cancellationToken);
-
-            list.Add(resource);
+            throw new ResourceNotFoundException();
         }
 
-        return list;
+        return await DecodeResource(record.Content, GetSupportedMediaType(), cancellationToken);
     }
 
-    public async Task<T> Update(T resource, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TResource>> Search(
+        IEnumerable<ICriterion> criteria,
+        CancellationToken cancellationToken = default
+    )
     {
-        using Document document = _db.GetDocument(resource.Id);
-        using MutableDocument mutableDocument =  document.ToMutable();
+        IList<TResource> resources = new List<TResource>();
 
-        await BuildDocument(mutableDocument, resource, cancellationToken);
+        ICouchDatabase<TPersisted> db = await GetDb(cancellationToken);
 
-        _db.Save(mutableDocument);
+        IQueryable<TPersisted> records = db;
 
-        return resource;
+        foreach(ICriterion criterion in criteria)
+        {
+            records = records.Where(_criterionProcessor.Handle(criterion));
+        }
+
+        foreach(TPersisted record in await records.ToListAsync())
+        {
+            resources.Add(await DecodeResource(record.Content, GetSupportedMediaType(), cancellationToken));
+        }
+
+        return resources;
     }
 
-    public void Dispose() =>
-        _db.Dispose();
+    public async Task<TResource> Update(TResource resource, CancellationToken cancellationToken = default)
+    {
+        ICouchDatabase<TPersisted> db = await GetDb(cancellationToken);
+
+        TPersisted persisted = new TPersisted()
+        {
+            Id = resource.Id,
+            Content = await EncodeResource(resource, cancellationToken),
+            MediaType = GetSupportedMediaType().ToString()
+        };
+        persisted.From(resource);
+
+        persisted = await db.AddOrUpdateAsync(persisted, false, cancellationToken);
+
+        return await DecodeResource(persisted.Content, GetSupportedMediaType(), cancellationToken);
+    }
+
+    private async Task<ICouchDatabase<TPersisted>> GetDb(CancellationToken cancellationToken) =>
+        await _client.GetOrCreateDatabaseAsync<TPersisted>(cancellationToken: cancellationToken);
 
     protected abstract WalkTrackMediaType GetSupportedMediaType();
 
     protected abstract ITranscoder GetTranscoder();
 
-    protected virtual async Task BuildDocument(
-        MutableDocument mutableDocument,
-        T resource,
-        CancellationToken cancellationToken
-    )
+    private async Task<string> EncodeResource(TResource resource, CancellationToken cancellationToken = default)
     {
         using MemoryStream memoryStream = new MemoryStream();
 
         await GetTranscoder().Encode(resource, memoryStream, cancellationToken);
 
-        string content = Encoding.UTF8.GetString(memoryStream.ToArray());
-
-        mutableDocument.SetString("content", content);
-        mutableDocument.SetString("mediatype", $"{GetSupportedMediaType()}");
+        return Encoding.UTF8.GetString(memoryStream.ToArray());
     }
 
-    private IQuery ProcessQuery(IFrom query, IEnumerable<ICriterion> criteria)
-    {
-        IExpression expression = Expression.String("1").EqualTo(Expression.String("1"));
-
-        foreach(ICriterion criterion in criteria)
-        {
-            expression = expression.And(_criterionProcessor.Handle(criterion));
-        }
-
-        return query.Where(expression);
-    }
-
-    private async Task<T> DecodeResource(string content, WalkTrackMediaType mediaType, CancellationToken cancellationToken)
+    private async Task<TResource> DecodeResource(string content, WalkTrackMediaType mediaType, CancellationToken cancellationToken)
     {
         using MemoryStream memoryStream = new MemoryStream();
         using StreamWriter writer = new StreamWriter(memoryStream);
@@ -178,11 +155,14 @@ public abstract class BaseRepository<T> : IResourceRepository<T>, IDisposable
 
         object instance = await GetTranscoder().Decode(memoryStream, cancellationToken);
 
-        if (instance is T typedInstance)
+        if (instance is TResource typedInstance)
         {
             return typedInstance;
         }
 
         throw new Exception("TODO");
     }
+
+    public ValueTask DisposeAsync() =>
+        _client.DisposeAsync();
 }

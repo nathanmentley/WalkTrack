@@ -14,14 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Couchbase.Lite.Query;
+using System.Linq.Expressions;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
 
 namespace WalkTrack.UserService.Server.DAL;
 
-internal class UsernameCriterionHandler: AbstractCriterionHandler<UsernameCriterion>
+internal class UsernameCriterionHandler : AbstractCriterionHandler<UsernameCriterion, UserPersistedDocuemnt>
 {
-    protected override IExpression Handle(UsernameCriterion criterion) =>
-        Expression.Property("username").EqualTo(Expression.String(criterion.Username));
+    protected override Expression<Func<UserPersistedDocuemnt, bool>> Handle(UsernameCriterion criterion)
+    {
+        return record => record.Username == criterion.Username;
+    }
 }

@@ -38,3 +38,6 @@ msbuild.wrn
 
 #config
 .env
+
+#persisted data
+data

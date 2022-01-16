@@ -14,17 +14,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Couchbase.Lite.Query;
+using System.Linq.Expressions;
+using CouchDB.Driver.Types;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server.Exceptions;
 
 namespace WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
 
-public class CriterionProcessor
+public class CriterionProcessor<TPersisted>
+    where TPersisted: CouchDocument
 {
-    private readonly IEnumerable<ICriterionHandler> _handlers;
+    private readonly IEnumerable<ICriterionHandler<TPersisted>> _handlers;
 
-    public CriterionProcessor(IEnumerable<ICriterionHandler> handlers)
+    public CriterionProcessor(IEnumerable<ICriterionHandler<TPersisted>> handlers)
     {
         if (handlers is null)
         {
@@ -34,9 +36,9 @@ public class CriterionProcessor
         _handlers = handlers;
     }
 
-    public IExpression Handle(ICriterion critierion)
+    public Expression<Func<TPersisted, bool>> Handle(ICriterion critierion)
     {
-        ICriterionHandler? handler = _handlers.FirstOrDefault(handler => handler.CanHandle(critierion));
+        ICriterionHandler<TPersisted>? handler = _handlers.FirstOrDefault(handler => handler.CanHandle(critierion));
 
         if (handler is null)
         {

@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Couchbase.Lite;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.DAL.CouchDb;
 using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
@@ -22,10 +21,10 @@ using WalkTrack.UserService.Common;
 
 namespace WalkTrack.UserService.Server.DAL;
 
-internal sealed class UserRepository: BaseRepository<User>, IUserRepository
+internal sealed class UserRepository: BaseRepository<User, UserPersistedDocuemnt>, IUserRepository
 {
-    private static readonly IEnumerable<ICriterionHandler> CriterionHandlers =
-        new ICriterionHandler[] {
+    private static readonly IEnumerable<ICriterionHandler<UserPersistedDocuemnt>> CriterionHandlers =
+        new ICriterionHandler<UserPersistedDocuemnt>[] {
             new IdCriterionHandler(),
             new UsernameCriterionHandler()
         };
@@ -42,23 +41,11 @@ internal sealed class UserRepository: BaseRepository<User>, IUserRepository
         new SecureUserJsonV1Transcoder();
 
     public UserRepository():
-        base("userdb", CriterionHandlers) {}
+        base("userDb", CriterionHandlers) {}
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
         SupportedMediaType;
 
     protected override ITranscoder GetTranscoder() =>
         Transcoder;
-
-    protected override async Task BuildDocument(
-        MutableDocument mutableDocument,
-        User resource,
-        CancellationToken cancellationToken
-    )
-    {
-        await base.BuildDocument(mutableDocument, resource, cancellationToken);
-
-        mutableDocument.SetString("username", resource.Username);
-        mutableDocument.SetString("password", resource.Password);
-    }
 }

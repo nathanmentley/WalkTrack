@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Couchbase.Lite" Version="2.8.6" />
+    <!-- until the dotnet 6 bug is fixed, we're gonna hack this, and use a custom version.
+      <PackageReference Include="CouchDB.NET" Version="3.1.1" />-->
+    <ProjectReference Include="..\..\..\ThirdParty\CouchDB.Driver\CouchDB.Driver.csproj" />
   </ItemGroup>
 
   <ItemGroup>

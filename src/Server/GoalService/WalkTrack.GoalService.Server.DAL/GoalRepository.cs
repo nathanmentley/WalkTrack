@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Couchbase.Lite;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.DAL.CouchDb;
 using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
@@ -22,10 +21,10 @@ using WalkTrack.GoalService.Common;
 
 namespace WalkTrack.GoalService.Server.DAL;
 
-internal sealed class GoalRepository: BaseRepository<Goal>, IGoalRepository
+internal sealed class GoalRepository: BaseRepository<Goal, GoalPersistedDocuemnt>, IGoalRepository
 {
-    private static readonly IEnumerable<ICriterionHandler> CriterionHandlers =
-        new ICriterionHandler[] {
+    private static readonly IEnumerable<ICriterionHandler<GoalPersistedDocuemnt>> CriterionHandlers =
+        new ICriterionHandler<GoalPersistedDocuemnt>[] {
             new IdCriterionHandler(),
             new UserIdCriterionHandler()
         };
@@ -42,22 +41,11 @@ internal sealed class GoalRepository: BaseRepository<Goal>, IGoalRepository
         new SecureGoalJsonV1Transcoder();
 
     public GoalRepository():
-        base("goaldb", CriterionHandlers) {}
+        base("goalDb", CriterionHandlers) {}
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
         SupportedMediaType;
 
     protected override ITranscoder GetTranscoder() =>
         Transcoder;
-
-    protected override async Task BuildDocument(
-        MutableDocument mutableDocument,
-        Goal resource,
-        CancellationToken cancellationToken
-    )
-    {
-        await base.BuildDocument(mutableDocument, resource, cancellationToken);
-
-        mutableDocument.SetString("userId", resource.UserId);
-    }
 }

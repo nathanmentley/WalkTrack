@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Couchbase.Lite;
 using WalkTrack.EntryService.Common;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.DAL.CouchDb;
@@ -22,10 +21,10 @@ using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
 
 namespace WalkTrack.EntryService.Server.DAL;
 
-internal sealed class EntryRepository: BaseRepository<Entry>, IEntryRepository
+internal sealed class EntryRepository: BaseRepository<Entry, EntryPersistedDocuemnt>, IEntryRepository
 {
-    private static readonly IEnumerable<ICriterionHandler> CriterionHandlers =
-        new ICriterionHandler[] {
+    private static readonly IEnumerable<ICriterionHandler<EntryPersistedDocuemnt>> CriterionHandlers =
+        new ICriterionHandler<EntryPersistedDocuemnt>[] {
             new IdCriterionHandler(),
             new UserIdCriterionHandler()
         };
@@ -42,22 +41,11 @@ internal sealed class EntryRepository: BaseRepository<Entry>, IEntryRepository
         new SecureEntryJsonV1Transcoder();
 
     public EntryRepository():
-        base("entrydb", CriterionHandlers) {}
+        base("entryDb", CriterionHandlers) {}
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
         SupportedMediaType;
 
     protected override ITranscoder GetTranscoder() =>
         Transcoder;
-
-    protected override async Task BuildDocument(
-        MutableDocument mutableDocument,
-        Entry resource,
-        CancellationToken cancellationToken
-    )
-    {
-        await base.BuildDocument(mutableDocument, resource, cancellationToken);
-
-        mutableDocument.SetString("userId", resource.UserId);
-    }
 }

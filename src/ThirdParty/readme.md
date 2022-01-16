@@ -1,0 +1,1 @@
+Keeping this project here until bug fixes in the libraries let us pull them from nuget.

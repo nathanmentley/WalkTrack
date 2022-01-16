@@ -14,14 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using Couchbase.Lite.Query;
+using System.Linq.Expressions;
+using CouchDB.Driver.Types;
 using WalkTrack.Framework.Common.Criteria;
 
 namespace WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
 
-public interface ICriterionHandler
+public interface ICriterionHandler<TPersisted>
+    where TPersisted: CouchDocument
 {
     bool CanHandle(ICriterion criterion);
 
-    IExpression Handle(ICriterion criterion);
+    Expression<Func<TPersisted, bool>> Handle(ICriterion criterion);
 }

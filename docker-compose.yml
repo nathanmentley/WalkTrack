@@ -1,5 +1,32 @@
 version: "3.9"
 services:
+  couchdb:
+    container_name: couchdb
+    image: couchdb:latest
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=password
+    expose:
+      - 5984
+    ports:
+      - "5984:5984"
+    volumes:
+      - couchdb:/opt/couchdb/data
+
+  mssql:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD="${MSSQL_PASSWORD}"
+      - MSSQL_PID=Express
+    expose:
+      - 1433
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql:/var/opt/mssql
+
   entryservice:
     container_name: entryservice
     build:
@@ -9,6 +36,8 @@ services:
     - JWT_SECRET="${JWT_SECRET}"
     expose:
     - 8001
+    depends_on:
+    - couchdb
     restart: unless-stopped
 
   goalservice:
@@ -20,6 +49,8 @@ services:
     - JWT_SECRET="${JWT_SECRET}"
     expose:
     - 8002
+    depends_on:
+    - couchdb
     restart: unless-stopped
 
   userservice:
@@ -33,6 +64,9 @@ services:
     - ADMIN_PASSWORD="${ADMIN_PASSWORD}"
     expose:
     - 8000
+    depends_on:
+    - couchdb
+    - mssql
     restart: unless-stopped
 
   app:
@@ -42,6 +76,10 @@ services:
       dockerfile: src/App/dockerfile
     expose:
     - 80
+    depends_on:
+    - entryservice
+    - goalservice
+    - userservice
     restart: unless-stopped
 
   proxy:
@@ -51,4 +89,16 @@ services:
     - ./config/proxy/nginx.conf:/etc/nginx/nginx.conf
     ports:
     - "80:80"
+    - "443:443"
+    depends_on:
+    - entryservice
+    - goalservice
+    - userservice
+    - app
     restart: unless-stopped
+
+volumes:
+  couchdb:
+    external: true
+  mssql:
+    external: true
