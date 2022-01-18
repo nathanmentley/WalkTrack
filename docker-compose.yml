@@ -11,7 +11,7 @@ services:
     ports:
       - "5984:5984"
     volumes:
-      - ./data/couchdb:/opt/couchdb/data
+      - ./data/couchdb:/bitnami/couchdb
     restart: unless-stopped
 
   mssql:
