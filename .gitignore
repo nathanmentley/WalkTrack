@@ -38,6 +38,7 @@ msbuild.wrn
 
 #config
 .env
+config/app/appsettings.json
 
 #persisted data
 data
