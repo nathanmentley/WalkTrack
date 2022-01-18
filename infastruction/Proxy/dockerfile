@@ -1,0 +1,5 @@
+FROM nginx:alpine
+
+ARG WalktrackEnvironment
+
+COPY config/proxy/nginx.$WalktrackEnvironment.conf /etc/nginx/nginx.conf

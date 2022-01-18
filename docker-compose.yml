@@ -11,7 +11,8 @@ services:
     ports:
       - "5984:5984"
     volumes:
-      - couchdb:/opt/couchdb/data
+      - ./data/couchdb:/opt/couchdb/data
+    restart: unless-stopped
 
   mssql:
     container_name: mssql
@@ -27,7 +28,8 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - mssql:/var/opt/mssql
+      - ./data/mssql:/var/opt/mssql
+    restart: unless-stopped
 
   entryservice:
     container_name: entryservice
@@ -92,9 +94,14 @@ services:
 
   proxy:
     container_name: proxy
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: infastruction/Proxy/dockerfile
+      args:
+        WalktrackEnvironment: ${WALKTRACK_ENVIRONMENT}
     volumes:
-    - ./config/proxy/nginx.conf:/etc/nginx/nginx.conf
+    - ./data/certbot/www:/var/www/certbot/:ro
+    - ./data/certbot/conf:/etc/nginx/ssl/:ro
     ports:
     - "80:80"
     - "443:443"
@@ -105,8 +112,8 @@ services:
     - app
     restart: unless-stopped
 
-volumes:
-  couchdb:
-    external: true
-  mssql:
-    external: true
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./data/certbot/www:/var/www/certbot/:rw
+      - ./data/certbot/conf:/etc/letsencrypt/:rw
