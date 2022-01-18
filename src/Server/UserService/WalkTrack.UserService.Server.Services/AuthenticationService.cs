@@ -16,10 +16,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WalkTrack.Framework.Common.Criteria;
+using WalkTrack.Framework.Server;
 using WalkTrack.Framework.Server.Exceptions;
 using WalkTrack.UserService.Common;
+using WalkTrack.UserService.Server.Configuration;
 
 namespace WalkTrack.UserService.Server.Services;
 
@@ -35,29 +38,44 @@ internal sealed class AuthenticationService: IAuthenticationService
     private readonly IHashingUtility _hashingUtility;
 
     public AuthenticationService(
+        IOptions<AdminSettings> adminSettings,
+        IOptions<AuthenticationSettings> authenticationSettings,
         IUserRepository repository,
         IHashingUtility hashingUtility
     )
     {
-        string jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ??
-            throw new InvalidOperationException("Required Environment Variable is missing. JWT_SECRET is required to run the service.");
+        if (adminSettings is null)
+        {
+            throw new ArgumentNullException(nameof(adminSettings));
+        }
 
-        _adminUsername = Environment.GetEnvironmentVariable("ADMIN_USERNAME") ??
-            throw new InvalidOperationException("Required Environment Variable is missing. ADMIN_USERNAME is required to run the service.");
+        if (authenticationSettings is null)
+        {
+            throw new ArgumentNullException(nameof(authenticationSettings));
+        }
 
-        _adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ??
-            throw new InvalidOperationException("Required Environment Variable is missing. ADMIN_PASSWORD is required to run the service.");
-
-        _repository = repository ??
+        if (repository is null)
+        {
             throw new ArgumentNullException(nameof(repository));
+        }
 
-        _hashingUtility = hashingUtility ??
+        if (hashingUtility is null)
+        {
             throw new ArgumentNullException(nameof(hashingUtility));
+        }
+
+        _adminUsername = adminSettings.Value.AdminUsername;
+
+        _adminPassword = adminSettings.Value.AdminPassword;
+
+        _repository = repository;
+
+        _hashingUtility = hashingUtility;
 
         _tokenHandler = new JwtSecurityTokenHandler();
 
         _signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret)),
+            new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
             SecurityAlgorithms.HmacSha256Signature
         );
     }

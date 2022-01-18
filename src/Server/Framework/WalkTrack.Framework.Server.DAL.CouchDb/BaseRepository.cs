@@ -34,6 +34,9 @@ public abstract class BaseRepository<TResource, TPersisted> : IResourceRepositor
 
     protected BaseRepository(
         string dbName,
+        string connectionString,
+        string username,
+        string password,
         IEnumerable<ICriterionHandler<TPersisted>> criterionHandlers
     )
     {
@@ -51,8 +54,9 @@ public abstract class BaseRepository<TResource, TPersisted> : IResourceRepositor
 
         _criterionProcessor = new CriterionProcessor<TPersisted>(criterionHandlers);
 
-        _client = new CouchClient("http://couchdb:5984", builder => builder
-            .UseBasicAuthentication("admin", "password")
+        _client = new CouchClient(
+            connectionString,
+            builder => builder.UseBasicAuthentication(username, password)
         );
     }
 

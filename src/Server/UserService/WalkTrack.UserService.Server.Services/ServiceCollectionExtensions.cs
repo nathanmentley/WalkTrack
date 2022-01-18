@@ -14,7 +14,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WalkTrack.UserService.Server.Configuration;
 
 namespace WalkTrack.UserService.Server.Services;
 
@@ -25,10 +27,12 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WithUserServices(this IServiceCollection collection) =>
+    public static IServiceCollection WithUserServices(this IServiceCollection collection, IConfiguration configuration) =>
         collection
             .AddSingleton<IAuthenticationService, AuthenticationService>()
             .AddSingleton<IHashingUtility, HashingUtility>()
             .AddSingleton<IUserService, UserService>()
+
+            .Configure<AdminSettings>(configuration.GetSection("AdminSettings"))
         ;
 }

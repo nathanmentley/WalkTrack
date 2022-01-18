@@ -16,12 +16,24 @@
 
 using SqlKata;
 using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
+using WalkTrack.Framework.Server.Exceptions;
 
-namespace WalkTrack.UserService.Server.DAL;
+namespace WalkTrack.Framework.Server.DAL.Mssql.Criteria;
 
-internal class UsernameCriterionHandler : AbstractCriterionHandler<UsernameCriterion>
+public abstract class AbstractCriterionHandler<TCriterion> : ICriterionHandler
+    where TCriterion: ICriterion
 {
-    protected override Query Handle(UsernameCriterion criterion, Query query) =>
-        query.Where("Username", criterion.Username);
+    public bool CanHandle(ICriterion criterion) => criterion is TCriterion;
+
+    public Query Handle(ICriterion criterion, Query query)
+    {
+        if (criterion is TCriterion typedCriterion)
+        {
+            return Handle(typedCriterion, query);
+        }
+
+        throw new InvalidQueryRequestException();
+    }
+
+    protected abstract Query Handle(TCriterion criterion, Query query);
 }

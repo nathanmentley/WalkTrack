@@ -14,10 +14,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Microsoft.Extensions.Options;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.DAL.CouchDb;
 using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
 using WalkTrack.GoalService.Common;
+using WalkTrack.GoalService.Server.Configuration;
 
 namespace WalkTrack.GoalService.Server.DAL;
 
@@ -40,8 +42,16 @@ internal sealed class GoalRepository: BaseRepository<Goal, GoalPersistedDocuemnt
     private static readonly ITranscoder Transcoder =
         new SecureGoalJsonV1Transcoder();
 
-    public GoalRepository():
-        base("goalDb", CriterionHandlers) {}
+    public GoalRepository(IOptions<DalSettings> dalSettings):
+        base(
+            "goalDb",
+            dalSettings.Value.ConnectionString,
+            dalSettings.Value.Username,
+            dalSettings.Value.Password,
+            CriterionHandlers
+        )
+    {
+    }
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
         SupportedMediaType;

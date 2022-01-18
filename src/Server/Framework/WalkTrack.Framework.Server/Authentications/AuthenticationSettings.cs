@@ -14,14 +14,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using SqlKata;
-using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
+namespace WalkTrack.Framework.Server;
 
-namespace WalkTrack.UserService.Server.DAL;
-
-internal class UsernameCriterionHandler : AbstractCriterionHandler<UsernameCriterion>
+/// <summary>
+/// </summary>
+public sealed class AuthenticationSettings
 {
-    protected override Query Handle(UsernameCriterion criterion, Query query) =>
-        query.Where("Username", criterion.Username);
+    /// <summary>
+    /// </summary>
+    public string JwtSecret { get; set; } = string.Empty;
 }

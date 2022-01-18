@@ -14,7 +14,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Microsoft.Extensions.Options;
 using WalkTrack.EntryService.Common;
+using WalkTrack.EntryService.Server.Configuration;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.DAL.CouchDb;
 using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
@@ -40,8 +42,16 @@ internal sealed class EntryRepository: BaseRepository<Entry, EntryPersistedDocue
     private static readonly ITranscoder Transcoder =
         new SecureEntryJsonV1Transcoder();
 
-    public EntryRepository():
-        base("entryDb", CriterionHandlers) {}
+    public EntryRepository(IOptions<DalSettings> dalSettings):
+        base(
+            "entryDb",
+            dalSettings.Value.ConnectionString,
+            dalSettings.Value.Username,
+            dalSettings.Value.Password,
+            CriterionHandlers
+        )
+    {
+    }
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
         SupportedMediaType;

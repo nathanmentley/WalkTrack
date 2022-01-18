@@ -15,6 +15,7 @@
 */
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
@@ -28,10 +29,15 @@ internal sealed class JwtMiddleware
     private readonly JwtSecurityTokenHandler _tokenHandler;
     private readonly TokenValidationParameters _tokenValidationParameters;
 
-    public JwtMiddleware(RequestDelegate next)
+    public JwtMiddleware(
+        IOptions<AuthenticationSettings> authenticationSettings,
+        RequestDelegate next
+    )
     {
-        string jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ??
-            throw new InvalidOperationException("Required Environment Variable is missing. JWT_SECRET is required to run the service.");
+        if (authenticationSettings is null)
+        {
+            throw new ArgumentNullException(nameof(authenticationSettings));
+        }
 
         _next = next;
 
@@ -40,7 +46,7 @@ internal sealed class JwtMiddleware
         _tokenValidationParameters = new TokenValidationParameters()
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
             ValidateIssuer = false,
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero

@@ -14,16 +14,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using System.Linq.Expressions;
+using SqlKata;
 using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
+using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
 
 namespace WalkTrack.UserService.Server.DAL;
 
-internal class IdCriterionHandler : AbstractCriterionHandler<IdCriterion, UserPersistedDocuemnt>
+internal class IdCriterionHandler : AbstractCriterionHandler<IdCriterion>
 {
-    protected override Expression<Func<UserPersistedDocuemnt, bool>> Handle(IdCriterion criterion)
-    {
-        return record => record.Id == criterion.Id;
-    }
+    protected override Query Handle(IdCriterion criterion, Query query) =>
+        query.Where("Id", criterion.Id);
 }

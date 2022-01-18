@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/mssql/server:2019-latest
+
+USER root
+
+COPY setup.sql setup.sql
+COPY importdata.sh importdata.sh
+COPY entrypoint.sh entrypoint.sh
+
+RUN chmod +x importdata.sh
+RUN chmod +x entrypoint.sh
+
+CMD /bin/bash ./entrypoint.sh

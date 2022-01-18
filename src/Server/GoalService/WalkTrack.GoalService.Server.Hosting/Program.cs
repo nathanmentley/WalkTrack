@@ -18,13 +18,18 @@ using WalkTrack.GoalService.Common;
 using WalkTrack.GoalService.Server.DAL;
 using WalkTrack.GoalService.Server.Services;
 using WalkTrack.Framework.Server.Hosting;
+using WalkTrack.GoalService.Server.Configuration;
 
 WebApplicationBuilder builder =
     WebApplication
         .CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder
     .Services
+        .AddOptions()
+        .Configure<DalSettings>(builder.Configuration.GetSection("DalSettings"))
         .WithFramework(builder.Configuration)
         .WtihGoalTranscoders()
         .WithGoalDAL()

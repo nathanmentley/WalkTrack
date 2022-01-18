@@ -14,24 +14,67 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
-using WalkTrack.UserService.Server.DAL;
-using WalkTrack.UserService.Server.Services;
+using FluentMigrator.Runner;
 using WalkTrack.Framework.Server.Hosting;
+using WalkTrack.UserService.Common;
+using WalkTrack.UserService.Server.Configuration;
+using WalkTrack.UserService.Server.DAL;
+using WalkTrack.UserService.Server.Hosting.Controllers;
+using WalkTrack.UserService.Server.Services;
 
-WebApplicationBuilder builder =
-    WebApplication
-        .CreateBuilder(args);
+namespace WalkTrack.UserService.Server.Hosting;
 
-builder
-    .Services
-        .WithFramework(builder.Configuration)
-        .WtihUserTranscoders()
-        .WithUserDAL()
-        .WithUserServices();
+public static class Program
+{
+    public static void Main(string[] args)
+    {
+        WebApplicationBuilder builder =
+            WebApplication
+                .CreateBuilder(args);
 
-WebApplication app = builder.Build();
+        builder.Configuration.AddEnvironmentVariables();
 
-app.WithFramework();
+        RegisterServices(builder.Services, builder.Configuration);
 
-app.Run();
+        WebApplication app = builder.Build();
+
+        app.WithFramework();
+
+        RunMigrations(app);
+
+        app.Run();
+    }
+
+    private static void RunMigrations(WebApplication app)
+    {
+        using IServiceScope scope = app.Services.CreateScope();
+
+        scope
+            .ServiceProvider
+            .GetRequiredService<IMigrationRunner>()
+            .MigrateUp();
+    }
+
+    private static void RegisterServices(IServiceCollection services, IConfiguration configuration) =>
+        services
+            .AddOptions()
+            .Configure<DalSettings>(configuration.GetSection("DalSettings"))
+            .WithFramework(configuration)
+            .WtihUserTranscoders()
+            .WithUserDAL()
+            .WithUserServices(configuration)
+
+            .AddFluentMigratorCore()
+            .ConfigureRunner(
+                runnerBuilder =>
+                    runnerBuilder
+                        .AddSqlServer()
+                        .WithGlobalConnectionString(
+                            configuration
+                                .GetSection("DalSettings")
+                                .GetValue<string>("ConnectionString")
+                        )
+                        .ScanIn(typeof(AuthenticationV1Controller).Assembly).For.Migrations()
+            )
+            .AddLogging(lb => lb.AddFluentMigratorConsole());
+}

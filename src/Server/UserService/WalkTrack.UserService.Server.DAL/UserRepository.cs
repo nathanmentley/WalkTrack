@@ -14,38 +14,52 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.Framework.Common.Resources;
-using WalkTrack.Framework.Server.DAL.CouchDb;
-using WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
+using Microsoft.Extensions.Options;
+using WalkTrack.Framework.Server.DAL.Mssql;
+using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
 using WalkTrack.UserService.Common;
+using WalkTrack.UserService.Server.Configuration;
 
 namespace WalkTrack.UserService.Server.DAL;
 
-internal sealed class UserRepository: BaseRepository<User, UserPersistedDocuemnt>, IUserRepository
+internal sealed class UserRepository: BaseRepository<User, UserPresistedResource>, IUserRepository
 {
-    private static readonly IEnumerable<ICriterionHandler<UserPersistedDocuemnt>> CriterionHandlers =
-        new ICriterionHandler<UserPersistedDocuemnt>[] {
+    private static readonly IEnumerable<ICriterionHandler> Handlers =
+        new ICriterionHandler[] {
             new IdCriterionHandler(),
             new UsernameCriterionHandler()
         };
 
-    private static readonly WalkTrackMediaType SupportedMediaType =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.SecureUser")
-            .WithVersion(1)
-            .Build();
+    private static readonly string TableName = "Users";
 
-    private static readonly ITranscoder Transcoder =
-        new SecureUserJsonV1Transcoder();
+    public UserRepository(IOptions<DalSettings> dalSettings):
+        base(
+            TableName,
+            dalSettings.Value.ConnectionString,
+            Handlers
+        )
+    {
+    }
 
-    public UserRepository():
-        base("userDb", CriterionHandlers) {}
+    protected override UserPresistedResource ConvertToRecord(User resource) =>
+        new UserPresistedResource()
+        {
+            Id = Guid.Parse(resource.Id),
+            Username = resource.Username,
+            Email = resource.Email,
+            IsPublic = resource.IsPublic,
+            Password = resource.Password,
+            Salt = resource.Salt
+        };
 
-    protected override WalkTrackMediaType GetSupportedMediaType() =>
-        SupportedMediaType;
-
-    protected override ITranscoder GetTranscoder() =>
-        Transcoder;
+    protected override User FromRecord(UserPresistedResource record) =>
+        new User()
+        {
+            Id = record.Id.ToString(),
+            Username = record.Username,
+            Email = record.Email,
+            IsPublic = record.IsPublic,
+            Password = record.Password,
+            Salt = record.Salt
+        };
 }

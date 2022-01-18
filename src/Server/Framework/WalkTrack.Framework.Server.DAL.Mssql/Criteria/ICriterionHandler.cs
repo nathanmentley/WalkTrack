@@ -14,14 +14,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using System.Linq.Expressions;
 using SqlKata;
 using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
 
-namespace WalkTrack.UserService.Server.DAL;
+namespace WalkTrack.Framework.Server.DAL.Mssql.Criteria;
 
-internal class UsernameCriterionHandler : AbstractCriterionHandler<UsernameCriterion>
+public interface ICriterionHandler
 {
-    protected override Query Handle(UsernameCriterion criterion, Query query) =>
-        query.Where("Username", criterion.Username);
+    bool CanHandle(ICriterion criterion);
+
+    Query Handle(ICriterion criterion, Query query);
 }

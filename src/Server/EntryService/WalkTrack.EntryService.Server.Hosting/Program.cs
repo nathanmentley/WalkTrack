@@ -15,6 +15,7 @@
 */
 
 using WalkTrack.EntryService.Common;
+using WalkTrack.EntryService.Server.Configuration;
 using WalkTrack.EntryService.Server.DAL;
 using WalkTrack.EntryService.Server.Services;
 using WalkTrack.Framework.Server.Hosting;
@@ -23,8 +24,12 @@ WebApplicationBuilder builder =
     WebApplication
         .CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 builder
     .Services
+        .AddOptions()
+        .Configure<DalSettings>(builder.Configuration.GetSection("DalSettings"))
         .WithFramework(builder.Configuration)
         .WtihEntryTranscoders()
         .WithEntryDAL()

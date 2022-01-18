@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System.Diagnostics.CodeAnalysis;
+using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace WalkTrack.UserService.Server.DAL;
@@ -27,6 +28,5 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection WithUserDAL(this IServiceCollection collection) =>
         collection
-            .AddSingleton<IUserRepository, UserRepository>()
-        ;
+            .AddSingleton<IUserRepository, UserRepository>();
 }

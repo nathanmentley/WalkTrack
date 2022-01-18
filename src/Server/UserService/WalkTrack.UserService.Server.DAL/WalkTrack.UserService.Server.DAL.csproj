@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Framework\WalkTrack.Framework.Server.DAL.CouchDb\WalkTrack.Framework.Server.DAL.CouchDb.csproj" />
+    <PackageReference Include="FluentMigrator" Version="3.3.2" />
+    <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
+    <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="3.3.2" />
+
+    <ProjectReference Include="..\..\Framework\WalkTrack.Framework.Server.DAL.Mssql\WalkTrack.Framework.Server.DAL.Mssql.csproj" />
 
     <ProjectReference Include="..\WalkTrack.UserService.Server\WalkTrack.UserService.Server.csproj" />
   </ItemGroup>

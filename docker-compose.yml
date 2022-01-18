@@ -2,10 +2,10 @@ version: "3.9"
 services:
   couchdb:
     container_name: couchdb
-    image: couchdb:latest
+    image: bitnami/couchdb:latest
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=password
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
     expose:
       - 5984
     ports:
@@ -15,10 +15,12 @@ services:
 
   mssql:
     container_name: mssql
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    build:
+      context: infastruction/Mssql
+      dockerfile: dockerfile
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD="${MSSQL_PASSWORD}"
+      - MSSQL_SA_PASSWORD=${MSSQL_PASSWORD}
       - MSSQL_PID=Express
     expose:
       - 1433
@@ -33,7 +35,10 @@ services:
       context: .
       dockerfile: src/Server/EntryService/dockerfile
     environment:
-    - JWT_SECRET="${JWT_SECRET}"
+    - AuthenticationSettings__JwtSecret=${JWT_SECRET}
+    - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
+    - DalSettings__Username=${COUCHDB_USER}
+    - DalSettings__Password=${COUCHDB_PASSWORD}
     expose:
     - 8001
     depends_on:
@@ -46,7 +51,10 @@ services:
       context: .
       dockerfile: src/Server/GoalService/dockerfile
     environment:
-    - JWT_SECRET="${JWT_SECRET}"
+    - AuthenticationSettings__JwtSecret=${JWT_SECRET}
+    - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
+    - DalSettings__Username=${COUCHDB_USER}
+    - DalSettings__Password=${COUCHDB_PASSWORD}
     expose:
     - 8002
     depends_on:
@@ -59,13 +67,13 @@ services:
       context: .
       dockerfile: src/Server/UserService/dockerfile
     environment:
-    - JWT_SECRET="${JWT_SECRET}"
-    - ADMIN_USERNAME="${ADMIN_USERNAME}"
-    - ADMIN_PASSWORD="${ADMIN_PASSWORD}"
+    - AuthenticationSettings__JwtSecret=${JWT_SECRET}
+    - DalSettings__ConnectionString=${MSSQL_CONNECTION_STRING}
+    - AdminSettings__AdminUsername=${ADMIN_USERNAME}
+    - AdminSettings__AdminPassword=${ADMIN_PASSWORD}
     expose:
     - 8000
     depends_on:
-    - couchdb
     - mssql
     restart: unless-stopped
 

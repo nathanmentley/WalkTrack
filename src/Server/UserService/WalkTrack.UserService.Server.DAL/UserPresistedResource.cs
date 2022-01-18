@@ -14,17 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
-using WalkTrack.Framework.Server.DAL.CouchDb;
+using WalkTrack.Framework.Server.DAL.Mssql;
 
 namespace WalkTrack.UserService.Server.DAL;
 
-internal sealed class UserPersistedDocuemnt: BasePersistedDocument<User>
+internal sealed class UserPresistedResource: BasePresistedResource
 {
-    public string Username { get; set; } = string.Empty;
-
-    public override void From(User resource)
-    {
-        Username = resource.Username;
-    }
+    internal Guid Id { get; init; } = Guid.Empty;
+    internal string Username { get; init; } = string.Empty;
+    internal string Email { get; init; } = string.Empty;
+    internal bool IsPublic { get; init; } = false;
+    internal string Password { get; init; } = string.Empty;
+    internal string Salt { get; init; } = string.Empty;
 }

@@ -64,6 +64,7 @@ public static class ServiceCollectionExtensions
             )
 
             .Configure<KestrelServerOptions>(options => options.AllowSynchronousIO = true)
+            .Configure<AuthenticationSettings>(configuration.GetSection("AuthenticationSettings"))
 
             .AddControllers();
 
