@@ -158,7 +158,7 @@
     {
         try
         {
-            model.SetGoals(await GoalClient.Search());
+            model.SetGoals((await GoalClient.Search()).Where(goal => !string.IsNullOrWhiteSpace(goal.UserId)));
         }
         catch(UnhandledResponseErrorException)
         {

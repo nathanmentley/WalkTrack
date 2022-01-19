@@ -28,6 +28,13 @@
 
 <p>Ran @model.Distance miles of @model.FinishLine</p>
 
+<select @onchange="ChangeGoal" class="form-select">
+    @foreach (Goal goal in model.Goals)
+    {
+        <option value="@goal.Id">@goal.Name</option>
+    }
+</select>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -58,7 +65,10 @@
 
         public decimal Distance => Entries.Sum(entry => entry.Distance);
 
-        public decimal FinishLine => Goal.Milestones.Sum(milestone => milestone.Distance);
+        public decimal FinishLine => 
+            Goal.Milestones.Any() ?
+                Goal.Milestones.Max(milestone => milestone.Distance):
+                decimal.Zero;
     }
     private readonly IndexModel model = new IndexModel();
 
@@ -68,10 +78,21 @@
         {
             NavigationManager.NavigateTo("/account/login");
         }
+        else
+        {
+            model.Goals = await GoalClient.Search();
+            model.Entries = await EntryClient.Search();
 
-        model.Goals = await GoalClient.Search();
-        model.Entries = await EntryClient.Search();
+            model.Goal = model.Goals.FirstOrDefault() ?? new Goal();
+        }
+    }
 
-        model.Goal = model.Goals.FirstOrDefault() ?? new Goal();
+    void ChangeGoal(ChangeEventArgs e)
+    {
+        string goalId = e.Value?.ToString() ?? string.Empty;
+
+        Goal? goal = model.Goals.FirstOrDefault(goal => string.Equals(goal.Id, goalId, StringComparison.OrdinalIgnoreCase));
+
+        model.Goal = goal is null ? new Goal(): goal;
     }
 }
