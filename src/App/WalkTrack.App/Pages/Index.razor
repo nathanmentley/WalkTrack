@@ -29,6 +29,13 @@
 
 <p>Ran @model.Distance miles of @model.FinishLine</p>
 
+<select @onchange="ChangeGoal" class="form-select">
+    @foreach (Goal goal in model.Goals)
+    {
+        <option value="@goal.Id">@goal.Name</option>
+    }
+</select>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -59,7 +66,10 @@
 
         public decimal Distance => Entries.Sum(entry => entry.Distance);
 
-        public decimal FinishLine => Goal.Milestones.Max(milestone => milestone.Distance);
+        public decimal FinishLine => 
+            Goal.Milestones.Any() ?
+                Goal.Milestones.Max(milestone => milestone.Distance):
+                decimal.Zero;
     }
     private readonly IndexModel model = new IndexModel();
 
@@ -69,28 +79,39 @@
         {
             NavigationManager.NavigateTo("/account/login");
         }
+        else
+        {
+            try
+            {
+                model.Goals = (await GoalClient.Search())
+                    .OrderBy(goal => string.IsNullOrWhiteSpace(goal.UserId))
+                    .ThenBy(goal => goal.Sort);
 
-        try
-        {
-            model.Goals = (await GoalClient.Search())
-                .OrderBy(goal => string.IsNullOrWhiteSpace(goal.UserId))
-                .ThenBy(goal => goal.Sort);
+                model.Entries = await EntryClient.Search();
+            }
+            catch(UnauthorizedException)
+            {
+                NavigationManager.NavigateTo("/account/login");
+            }
+            catch(ForbiddenException)
+            {
+                await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
+            }
+            catch(UnhandledResponseErrorException)
+            {
+                await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+            }
 
-            model.Entries = await EntryClient.Search();
+            model.Goal = model.Goals.FirstOrDefault() ?? new Goal();
         }
-        catch(UnauthorizedException)
-        {
-            NavigationManager.NavigateTo("/account/login");
-        }
-        catch(ForbiddenException)
-        {
-            await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
-        }
-        catch(UnhandledResponseErrorException)
-        {
-            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
-        }
+    }
 
-        model.Goal = model.Goals.FirstOrDefault() ?? new Goal();
+    void ChangeGoal(ChangeEventArgs e)
+    {
+        string goalId = e.Value?.ToString() ?? string.Empty;
+
+        Goal? goal = model.Goals.FirstOrDefault(goal => string.Equals(goal.Id, goalId, StringComparison.OrdinalIgnoreCase));
+
+        model.Goal = goal is null ? new Goal(): goal;
     }
 }

@@ -60,8 +60,22 @@ public abstract class BaseRepository<TResource, TPersisted> : IResourceRepositor
         );
     }
 
-    public async Task<TResource> Create(TResource resource, CancellationToken cancellationToken = default) =>
-        await Update(resource, cancellationToken);
+    public async Task<TResource> Create(TResource resource, CancellationToken cancellationToken = default)
+    {
+        ICouchDatabase<TPersisted> db = await GetDb(cancellationToken);
+
+        TPersisted persisted = new TPersisted()
+        {
+            Id = resource.Id,
+            Content = await EncodeResource(resource, cancellationToken),
+            MediaType = GetSupportedMediaType().ToString()
+        };
+        persisted.From(resource);
+
+        persisted = await db.AddOrUpdateAsync(persisted, false, cancellationToken);
+
+        return await DecodeResource(persisted.Content, GetSupportedMediaType(), cancellationToken);
+    }
 
     public async Task Delete(string id, CancellationToken cancellationToken = default)
     {
@@ -107,7 +121,8 @@ public abstract class BaseRepository<TResource, TPersisted> : IResourceRepositor
             records = records.Where(_criterionProcessor.Handle(criterion));
         }
 
-        foreach(TPersisted record in await records.ToListAsync())
+        //TODO: setup true pagination.
+        foreach(TPersisted record in await records.Take(int.MaxValue).ToListAsync())
         {
             resources.Add(await DecodeResource(record.Content, GetSupportedMediaType(), cancellationToken));
         }
@@ -119,17 +134,20 @@ public abstract class BaseRepository<TResource, TPersisted> : IResourceRepositor
     {
         ICouchDatabase<TPersisted> db = await GetDb(cancellationToken);
 
-        TPersisted persisted = new TPersisted()
+        TPersisted? record = db.FirstOrDefault(x => x.Id == resource.Id);
+
+        if (record is null)
         {
-            Id = resource.Id,
-            Content = await EncodeResource(resource, cancellationToken),
-            MediaType = GetSupportedMediaType().ToString()
-        };
-        persisted.From(resource);
+            throw new ResourceNotFoundException();
+        }
 
-        persisted = await db.AddOrUpdateAsync(persisted, false, cancellationToken);
+        record.Content = await EncodeResource(resource, cancellationToken);
+        record.MediaType = GetSupportedMediaType().ToString();
+        record.From(resource);
 
-        return await DecodeResource(persisted.Content, GetSupportedMediaType(), cancellationToken);
+        record = await db.AddOrUpdateAsync(record, false, cancellationToken);
+
+        return await DecodeResource(record.Content, GetSupportedMediaType(), cancellationToken);
     }
 
     private async Task<ICouchDatabase<TPersisted>> GetDb(CancellationToken cancellationToken) =>

@@ -62,6 +62,8 @@ internal sealed class WalkTrackExceptionFilter: ExceptionFilterAttribute
     {
         IExceptionHandler? handler = _handlers.FirstOrDefault(handler => handler.CanHandle(context.Exception));
 
+        Console.Write($"{context.Exception}");
+
         if (handler is not null)
         {
             _Logger.LogDebug(
