@@ -106,10 +106,10 @@
 </table>
 
 @code {
-    private readonly MilestoneModel model = new MilestoneModel();
-
     [Parameter]
     public string GoalId { get; set; } = string.Empty;
+
+    private readonly MilestoneModel model = new MilestoneModel();
 
     protected override async Task OnInitializedAsync()
     {
