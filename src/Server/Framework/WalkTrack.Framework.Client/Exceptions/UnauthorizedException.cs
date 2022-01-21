@@ -14,19 +14,39 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+using System.Diagnostics.CodeAnalysis;
 
-namespace WalkTrack.UserService.Server;
+namespace WalkTrack.Framework.Client.Exceptions;
 
 /// <summary>
 /// </summary>
-public interface IAuthenticationService
+[ExcludeFromCodeCoverage]
+public class UnauthorizedException: BaseClientWalkTrackException
 {
     /// <summary>
+    /// Constructor
     /// </summary>
-    Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, CancellationToken cancellationToken = default);
+    /// <param name="message">
+    /// A message describing the exceptional situation in detail.
+    /// </param>
+    /// <param name="innerException">
+    /// Another exception that brought this exception to light.
+    /// </param>
+    public UnauthorizedException(string message, Exception innerException):
+        base(message, innerException) {}
 
     /// <summary>
+    /// Constructor
     /// </summary>
-    Task<Token> RefreshToken(Token token, CancellationToken cancellationToken = default);
+    /// <param name="message">
+    /// A message describing the exceptional situation in detail.
+    /// </param>
+    public UnauthorizedException(string message):
+        base(message) {}
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public UnauthorizedException():
+        base() {}
 }

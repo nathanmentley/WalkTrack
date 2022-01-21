@@ -43,4 +43,12 @@ internal static class MediaTypes
             .WithStructure("WalkTrack.AuthenticateResponse")
             .WithVersion(1)
             .Build();
+
+    public static readonly WalkTrackMediaType Token =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Token")
+            .WithVersion(1)
+            .Build();
 }

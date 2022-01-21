@@ -16,6 +16,7 @@
 
 using Blazored.LocalStorage;
 using WalkTrack.UserService.Client;
+using WalkTrack.UserService.Common;
 
 namespace WalkTrack.App.State;
 
@@ -23,9 +24,11 @@ namespace WalkTrack.App.State;
 /// </summary>
 public static class AppState
 {
-    public static async Task<bool> IsLoggedIn(IAuthenticationClient authenticationClient, ILocalStorageService localStorage)
+    public static async Task<bool> IsLoggedIn(
+        IAuthenticationClient authenticationClient,
+        ILocalStorageService localStorage
+    )
     {
-
         string token = await localStorage.GetItemAsync<string>("token");
 
         if (string.IsNullOrWhiteSpace(token))
@@ -33,18 +36,16 @@ public static class AppState
             return false;
         }
 
-        await authenticationClient.Login(token);
+        Token refreshedToken = await authenticationClient.RefreshToken(new Token() { Id = token });
+
+        await authenticationClient.Login(refreshedToken);
 
         return true;
     }
 
-    public static async Task PersistToken(ILocalStorageService localStorage, string token)
-    {
+    public static async Task PersistToken(ILocalStorageService localStorage, string token) =>
         await localStorage.SetItemAsync("token", token);
-    }
 
-    public static async Task Logout(ILocalStorageService localStorage)
-    {
+    public static async Task Logout(ILocalStorageService localStorage) =>
         await localStorage.SetItemAsync("token", string.Empty);
-    }
 }

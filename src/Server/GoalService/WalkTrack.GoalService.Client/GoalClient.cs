@@ -66,6 +66,9 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Goal>(_httpClient, cancellationToken);
 
     public async Task<IEnumerable<Goal>> Search(CancellationToken cancellationToken = default) =>
@@ -79,6 +82,8 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             .WithAcceptType(_goalsMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<IEnumerable<Goal>>(_httpClient, cancellationToken);
 
     public async Task<Goal> Create(Goal goal, CancellationToken cancellationToken = default) =>
@@ -94,6 +99,8 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Goal, Goal>(_httpClient, cancellationToken);
 
     public async Task Update(Goal goal, CancellationToken cancellationToken = default) =>
@@ -108,6 +115,9 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             )
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<Goal>(_httpClient, cancellationToken);
 
     public async Task Delete(Goal goal, CancellationToken cancellationToken = default) =>
@@ -122,5 +132,8 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
 }

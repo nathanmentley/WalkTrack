@@ -21,35 +21,35 @@ using WalkTrack.UserService.Common;
 namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[Route("v1/authenticate")]
-public sealed class AuthenticationV1Controller
+[Route("v1/token")]
+public sealed class RefreshTokenV1Controller
 {
     private readonly IAuthenticationService _service;
 
-    public AuthenticationV1Controller(IAuthenticationService service)
+    public RefreshTokenV1Controller(IAuthenticationService service)
     {
         _service = service ??
             throw new ArgumentNullException(nameof(service));
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Authenticate(
-        [FromBody] AuthenticateRequest request,
+    [HttpPut]
+    public async Task<IActionResult> RefreshToken(
+        [FromBody] Token request,
         CancellationToken cancellationToken
     )
     {
         if (request is null)
         {
-            throw new MissingBodyException($"{nameof(request)} is required for {nameof(Authenticate)}.");
+            throw new MissingBodyException($"{nameof(request)} is required for {nameof(RefreshToken)}.");
         }
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        AuthenticateResponse response = await _service.Authenticate(request, cancellationToken);
+        Token response = await _service.RefreshToken(request, cancellationToken);
 
         return new ObjectResult(response)
         {
-            StatusCode = StatusCodes.Status201Created
+            StatusCode = StatusCodes.Status200OK
         };
     }
 }

@@ -126,6 +126,14 @@
             {
                 await GoalClient.Delete(goal);
             }
+            catch(UnauthorizedException)
+            {
+                NavigationManager.NavigateTo("/account/login");
+            }
+            catch(ForbiddenException)
+            {
+                await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
+            }
             catch(UnhandledResponseErrorException)
             {
                 await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
@@ -143,6 +151,14 @@
         {
             await GoalClient.Create(model.ToGoal());
         }
+        catch(UnauthorizedException)
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+        catch(ForbiddenException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
+        }
         catch(UnhandledResponseErrorException)
         {
             await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
@@ -159,6 +175,14 @@
         try
         {
             model.SetGoals(await GoalClient.Search());
+        }
+        catch(UnauthorizedException)
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+        catch(ForbiddenException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
         }
         catch(UnhandledResponseErrorException)
         {

@@ -16,6 +16,7 @@
 
 @page "/"
 
+@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IAuthenticationClient AuthenticationClient
 @inject IEntryClient EntryClient
@@ -58,7 +59,7 @@
 
         public decimal Distance => Entries.Sum(entry => entry.Distance);
 
-        public decimal FinishLine => Goal.Milestones.Sum(milestone => milestone.Distance);
+        public decimal FinishLine => Goal.Milestones.Max(milestone => milestone.Distance);
     }
     private readonly IndexModel model = new IndexModel();
 
@@ -69,8 +70,26 @@
             NavigationManager.NavigateTo("/account/login");
         }
 
-        model.Goals = await GoalClient.Search();
-        model.Entries = await EntryClient.Search();
+        try
+        {
+            model.Goals = (await GoalClient.Search())
+                .OrderBy(goal => string.IsNullOrWhiteSpace(goal.UserId))
+                .ThenBy(goal => goal.Sort);
+
+            model.Entries = await EntryClient.Search();
+        }
+        catch(UnauthorizedException)
+        {
+            NavigationManager.NavigateTo("/account/login");
+        }
+        catch(ForbiddenException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
+        }
+        catch(UnhandledResponseErrorException)
+        {
+            await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
+        }
 
         model.Goal = model.Goals.FirstOrDefault() ?? new Goal();
     }

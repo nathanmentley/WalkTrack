@@ -82,6 +82,9 @@ internal sealed class UserClient: BaseClient, IUserClient
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<User>(_httpClient, cancellationToken);
 
     public async Task<IEnumerable<User>> Search(CancellationToken cancellationToken = default) =>
@@ -95,6 +98,8 @@ internal sealed class UserClient: BaseClient, IUserClient
             .WithAcceptType(_usersMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<IEnumerable<User>>(_httpClient, cancellationToken);
 
     public async Task<User> Create(CreateUserRequest request, CancellationToken cancellationToken = default) =>
@@ -109,6 +114,8 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<CreateUserRequest, User>(_httpClient, cancellationToken);
 
     public async Task Update(User user, CancellationToken cancellationToken = default) =>
@@ -123,6 +130,9 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAuthToken(AuthenticationContext.Token)
             .WithAcceptType(MediaTypes.ApiError)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<User>(_httpClient, cancellationToken);
 
     public async Task UpdatePassword(UpdatePasswordRequest request, CancellationToken cancellationToken = default) =>
@@ -137,6 +147,9 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<UpdatePasswordRequest>(_httpClient, cancellationToken);
 
     public async Task Delete(User user, CancellationToken cancellationToken = default) =>
@@ -151,5 +164,8 @@ internal sealed class UserClient: BaseClient, IUserClient
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
 }

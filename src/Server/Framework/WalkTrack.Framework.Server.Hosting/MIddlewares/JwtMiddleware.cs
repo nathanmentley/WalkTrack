@@ -71,9 +71,7 @@ internal sealed class JwtMiddleware
         {
             _tokenHandler.ValidateToken(token, _tokenValidationParameters, out SecurityToken validatedToken);
 
-            JwtSecurityToken? jwtToken = validatedToken as JwtSecurityToken;
-
-            if (jwtToken is null)
+            if (validatedToken is not JwtSecurityToken jwtToken)
             {
                 throw new InvalidOperationException("Cannot process authentication because the token isn't a valid JWT.");
             }

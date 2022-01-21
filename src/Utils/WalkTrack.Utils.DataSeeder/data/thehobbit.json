@@ -85,6 +85,86 @@
             "name": "Rivendell",
             "description": "",
             "distance": 397
+        },
+        {
+            "name": "Captured By Goblins",
+            "description": "",
+            "distance": 469
+        },
+        {
+            "name": "Fight Off Goblins",
+            "description": "",
+            "distance": 482
+        },
+        {
+            "name": "Goblin Attack",
+            "description": "",
+            "distance": 494
+        },
+        {
+            "name": "Find One Ring",
+            "description": "",
+            "distance": 496
+        },
+        {
+            "name": "Gollum's Lake",
+            "description": "",
+            "distance": 504.5
+        },
+        {
+            "name": "Warg Attack",
+            "description": "",
+            "distance": 535
+        },
+        {
+            "name": "Beorn's House",
+            "description": "",
+            "distance": 605
+        },
+        {
+            "name": "Mirkwood",
+            "description": "",
+            "distance": 667
+        },
+        {
+            "name": "Run out of food in Mirkwood",
+            "description": "",
+            "distance": 837
+        },
+        {
+            "name": "Rescues Dwarves from Spiders",
+            "description": "",
+            "distance": 846
+        },
+        {
+            "name": "Captured by Thranduil",
+            "description": "",
+            "distance": 855
+        },
+        {
+            "name": "Leave Mirkwood",
+            "description": "",
+            "distance": 857
+        },
+        {
+            "name": "Lake Town",
+            "description": "",
+            "distance": 901
+        },
+        {
+            "name": "The Lonely Mountain",
+            "description": "",
+            "distance": 929
+        },
+        {
+            "name": "Meet Smaug",
+            "description": "",
+            "distance": 948
+        },
+        {
+            "name": "Bilbo Gives Bard the Arkenstone",
+            "description": "",
+            "distance": 967
         }
     ]
 }

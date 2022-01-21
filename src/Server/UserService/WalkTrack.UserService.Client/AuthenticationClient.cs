@@ -60,9 +60,32 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
         return response;
     }
 
-    public Task Login(string token, CancellationToken cancellationToken = default)
+    public async Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default)
     {
-        AuthenticationContext.Token = token;
+        Token response =
+            await new RequestBuilder(_transcoder)
+                .WithBody(request)
+                .WithContentTypes(MediaTypes.Token)
+                .WithMethod(HttpMethod.Put)
+                .WithUrl(
+                    new Url()
+                        .AppendPathSegment("v1")
+                        .AppendPathSegment("token")
+                )
+                .WithAcceptType(MediaTypes.Token)
+                .WithAcceptType(MediaTypes.ApiError)
+                .WithErrorHandler(new ForbiddenErrorHandler())
+                .WithErrorHandler(new UnauthorizedErrorHandler())
+                .Fetch<Token, Token>(_httpClient, cancellationToken);
+
+        AuthenticationContext.Token = response.Id;
+
+        return response;
+    }
+
+    public Task Login(Token token, CancellationToken cancellationToken = default)
+    {
+        AuthenticationContext.Token = token.Id;
 
         return Task.CompletedTask;
     }

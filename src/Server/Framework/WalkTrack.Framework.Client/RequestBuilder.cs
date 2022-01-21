@@ -169,7 +169,9 @@ public class RequestBuilder
                 throw errorHandler.Handle(apiError);
             }
 
-            throw new UnhandledResponseErrorException($"An unhandled client error occured with the message: {apiError.Message}");
+            throw new UnhandledResponseErrorException(
+                $"An unhandled client error occured with the message: {apiError.Message}"
+            );
         }
     }
 

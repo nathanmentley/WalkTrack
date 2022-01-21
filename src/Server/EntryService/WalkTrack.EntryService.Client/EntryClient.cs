@@ -66,6 +66,9 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             .WithAcceptType(_entryMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Entry>(_httpClient, cancellationToken);
 
     public async Task<IEnumerable<Entry>> Search(CancellationToken cancellationToken = default) =>
@@ -79,6 +82,8 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             .WithAcceptType(_entriesMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<IEnumerable<Entry>>(_httpClient, cancellationToken);
 
     public async Task<Entry> Create(Entry entry, CancellationToken cancellationToken = default) =>
@@ -94,6 +99,8 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             .WithAcceptType(_entryMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Entry, Entry>(_httpClient, cancellationToken);
 
     public async Task Update(Entry entry, CancellationToken cancellationToken = default) =>
@@ -108,6 +115,9 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             )
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<Entry>(_httpClient, cancellationToken);
 
     public async Task Delete(Entry entry, CancellationToken cancellationToken = default) =>
@@ -122,5 +132,8 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             .WithAcceptType(_entryMediaType)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
+            .WithErrorHandler(new ResourceNotFoundErrorHandler())
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
 }

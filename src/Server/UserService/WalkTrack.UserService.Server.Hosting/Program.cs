@@ -74,7 +74,7 @@ public static class Program
                                 .GetSection("DalSettings")
                                 .GetValue<string>("ConnectionString")
                         )
-                        .ScanIn(typeof(AuthenticationV1Controller).Assembly).For.Migrations()
+                        .ScanIn(typeof(AuthenticateV1Controller).Assembly).For.Migrations()
             )
             .AddLogging(lb => lb.AddFluentMigratorConsole());
 }

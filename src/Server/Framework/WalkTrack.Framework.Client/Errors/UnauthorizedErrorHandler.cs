@@ -14,17 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+using WalkTrack.Framework.Client.Exceptions;
+using WalkTrack.Framework.Common.ApiErrorResponses;
 
-namespace WalkTrack.UserService.Client;
+namespace WalkTrack.Framework.Client;
 
-public interface IAuthenticationClient
+public class UnauthorizedErrorHandler: IErrorHandler
 {
-    Task<AuthenticateResponse> Login(AuthenticateRequest request, CancellationToken cancellationToken = default);
+    public bool CanHandle(ApiErrorResponse apiError) =>
+        apiError.StatusCode == 401;
 
-    Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default);
-
-    Task Login(Token token, CancellationToken cancellationToken = default);
-
-    Task Logout(CancellationToken cancellationToken = default);
+    public Exception Handle(ApiErrorResponse apiError) =>
+        new UnauthorizedException();
 }

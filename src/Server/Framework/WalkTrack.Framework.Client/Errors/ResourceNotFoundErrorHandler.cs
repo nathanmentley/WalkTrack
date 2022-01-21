@@ -21,6 +21,9 @@ namespace WalkTrack.Framework.Client;
 
 public class ResourceNotFoundErrorHandler: IErrorHandler
 {
-    public bool CanHandle(ApiErrorResponse apiError) => true;
-    public Exception Handle(ApiErrorResponse apiError) => new ResourceNotFoundException();
+    public bool CanHandle(ApiErrorResponse apiError) =>
+        apiError.StatusCode == 404;
+
+    public Exception Handle(ApiErrorResponse apiError) =>
+        new ResourceNotFoundException();
 }

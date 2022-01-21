@@ -14,17 +14,29 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+using WalkTrack.EntryService.Common;
 
-namespace WalkTrack.UserService.Client;
+namespace WalkTrack.App.Pages.Models;
 
-public interface IAuthenticationClient
+public class EntryModel
 {
-    Task<AuthenticateResponse> Login(AuthenticateRequest request, CancellationToken cancellationToken = default);
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+    public decimal Distance { get; set; } = 0;
 
-    Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default);
+    public bool Collapsed { get; set; } = true;
+    public bool Loading { get; set; } = false;
 
-    Task Login(Token token, CancellationToken cancellationToken = default);
+    public IEnumerable<Entry> Entries { get; private set; } = Enumerable.Empty<Entry>();
 
-    Task Logout(CancellationToken cancellationToken = default);
+    public void SetEntries(IEnumerable<Entry> entries)
+    {
+        Entries = entries;
+    }
+
+    public Entry ToEntry() =>
+        new Entry()
+        {
+            Date = Date,
+            Distance = Distance
+        };
 }

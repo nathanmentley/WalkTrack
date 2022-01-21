@@ -33,9 +33,10 @@ internal sealed class AuthenticationService: IAuthenticationService
     private readonly string _adminUsername;
     private readonly string _adminPassword;
     private readonly IUserRepository _repository;
+    private readonly IHashingUtility _hashingUtility;
     private readonly JwtSecurityTokenHandler _tokenHandler;
     private readonly SigningCredentials _signingCredentials;
-    private readonly IHashingUtility _hashingUtility;
+    private readonly TokenValidationParameters _tokenValidationParameters;
 
     public AuthenticationService(
         IOptions<AdminSettings> adminSettings,
@@ -78,6 +79,15 @@ internal sealed class AuthenticationService: IAuthenticationService
             new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
             SecurityAlgorithms.HmacSha256Signature
         );
+
+        _tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
     }
 
     /// <summary>
@@ -87,6 +97,11 @@ internal sealed class AuthenticationService: IAuthenticationService
         CancellationToken cancellationToken = default
     )
     {
+        if (request is null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
         if (
             string.Equals(_adminUsername, request.Username, StringComparison.OrdinalIgnoreCase) &&
             string.Equals(_adminPassword, request.Password, StringComparison.Ordinal)
@@ -115,6 +130,41 @@ internal sealed class AuthenticationService: IAuthenticationService
         };
     }
 
+    public Task<Token> RefreshToken(
+        Token token,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (token is null)
+        {
+            throw new ArgumentNullException(nameof(token));
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        ClaimsPrincipal indentity =
+            _tokenHandler.ValidateToken(token.Id, _tokenValidationParameters, out SecurityToken validatedToken);
+
+        if (validatedToken is not JwtSecurityToken jwtToken)
+        {
+            throw new InvalidOperationException("Cannot process authentication because the token isn't a valid JWT.");
+        }
+
+        Claim? idClaim =
+            indentity.Claims.FirstOrDefault(claim =>
+                string.Equals(claim.Type, "id", StringComparison.OrdinalIgnoreCase)
+            );
+
+        if (idClaim is null)
+        {
+            throw new InvalidOperationException("Cannot process authentication because the token doesn't contain required claims.");
+        }
+
+        return Task.FromResult(
+            new Token() { Id = GenerateJwtToken(idClaim.Value) }
+        );
+    }
+
     private AuthenticateResponse BuildResponse(User user, string password)
     {
         string hash = _hashingUtility.Hash(password, user.Salt);
@@ -125,7 +175,7 @@ internal sealed class AuthenticationService: IAuthenticationService
             {
                 Id = user.Id,
                 Username = user.Username,
-                Token = GenerateJwtToken(user)
+                Token = GenerateJwtToken(user.Id)
             };
         }
         
@@ -141,7 +191,7 @@ internal sealed class AuthenticationService: IAuthenticationService
                     Expires = DateTime.UtcNow.AddDays(7),
                     Subject = new ClaimsIdentity(
                         new[] {
-                            new Claim("id", "id"),
+                            new Claim("id", "n/a"),
                             new Claim("admin", "admin")
                         }
                     )
@@ -149,7 +199,7 @@ internal sealed class AuthenticationService: IAuthenticationService
             )
         );
 
-    private string GenerateJwtToken(User user) =>
+    private string GenerateJwtToken(string userId) =>
         _tokenHandler.WriteToken(
             _tokenHandler.CreateToken(
                 new SecurityTokenDescriptor()
@@ -158,7 +208,7 @@ internal sealed class AuthenticationService: IAuthenticationService
                     Expires = DateTime.UtcNow.AddDays(7),
                     Subject = new ClaimsIdentity(
                         new[] {
-                            new Claim("id", user.Id)
+                            new Claim("id", userId)
                         }
                     )
                 }

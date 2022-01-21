@@ -1,5 +1,5 @@
 FROM nginx:alpine
 
-ARG WalktrackEnvironment
+ARG WalktrackEnvironment=dev
 
 COPY config/proxy/nginx.$WalktrackEnvironment.conf /etc/nginx/nginx.conf

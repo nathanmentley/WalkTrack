@@ -38,5 +38,9 @@ public sealed record Goal: IResource
 
     /// <summary>
     /// </summary>
+    public int Sort { get; init; } = 0;
+
+    /// <summary>
+    /// </summary>
     public IEnumerable<Milestone> Milestones { get; init; } = Enumerable.Empty<Milestone>();
 }
