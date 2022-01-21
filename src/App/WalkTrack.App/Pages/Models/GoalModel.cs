@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using WalkTrack.App.State;
 using WalkTrack.GoalService.Common;
 
 namespace WalkTrack.App.Pages.Models;
@@ -35,6 +36,7 @@ public class GoalModel
     public Goal ToGoal() =>
         new Goal()
         {
-            Name = Name
+            Name = Name,
+            UserId = AppState.UserId
         };
 }

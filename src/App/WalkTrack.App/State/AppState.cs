@@ -24,14 +24,23 @@ namespace WalkTrack.App.State;
 /// </summary>
 public static class AppState
 {
+    private static readonly string TokenKey = "token";
+    private static readonly string UserIdKey = "userId";
+
+    public static string UserId { get; private set; } = string.Empty;
+
     public static async Task<bool> IsLoggedIn(
         IAuthenticationClient authenticationClient,
         ILocalStorageService localStorage
     )
     {
-        string token = await localStorage.GetItemAsync<string>("token");
+        string token = await localStorage.GetItemAsync<string>(TokenKey);
+        UserId = await localStorage.GetItemAsync<string>(UserIdKey);
 
-        if (string.IsNullOrWhiteSpace(token))
+        if (
+            string.IsNullOrWhiteSpace(token) ||
+            string.IsNullOrWhiteSpace(UserId)
+        )
         {
             return false;
         }
@@ -43,9 +52,17 @@ public static class AppState
         return true;
     }
 
-    public static async Task PersistToken(ILocalStorageService localStorage, string token) =>
-        await localStorage.SetItemAsync("token", token);
+    public static async Task PersistToken(ILocalStorageService localStorage, string token, string userId)
+    {
+        await localStorage.SetItemAsync(TokenKey, token);
+        await localStorage.SetItemAsync(UserIdKey, userId);
+    }
 
-    public static async Task Logout(ILocalStorageService localStorage) =>
-        await localStorage.SetItemAsync("token", string.Empty);
+    public static async Task Logout(ILocalStorageService localStorage)
+    {
+        await localStorage.SetItemAsync(TokenKey, string.Empty);
+        await localStorage.SetItemAsync(UserIdKey, string.Empty);
+
+        UserId = string.Empty;
+    }
 }

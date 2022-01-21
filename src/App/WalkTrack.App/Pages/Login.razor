@@ -77,7 +77,7 @@
         {
             AuthenticateResponse response = await AuthenticationClient.Login(model.ToLoginRequest());
 
-            await AppState.PersistToken(LocalStorageService, response.Token);
+            await AppState.PersistToken(LocalStorageService, response.Token, response.Id);
 
             NavigationManager.NavigateTo("");
         }

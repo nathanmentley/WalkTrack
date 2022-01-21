@@ -141,7 +141,7 @@ internal sealed class GoalService: IGoalService
         {
             if (!string.Equals(record.UserId, userAuthenticationContext.UserId, StringComparison.OrdinalIgnoreCase))
             {
-                throw new Exception("TODO");
+                throw new ResourceNotFoundException("TODO");
             }
         }
 
