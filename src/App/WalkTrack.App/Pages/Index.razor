@@ -65,7 +65,17 @@
             <tr>
                 <td>@milestone.Name</td>
                 <td>@milestone.Distance</td>
-                <td>@(milestone.Distance < model.Distance ? "100%" : String.Format("{0:0%}", model.Distance / milestone.Distance))</td>
+                <td>
+                    @(
+                        model.Distance == 0 ?
+                            "0%":
+                            (
+                                milestone.Distance < model.Distance ?
+                                    "100%" :
+                                    String.Format("{0:0%}", model.Distance / milestone.Distance)
+                            )
+                    )
+                </td>
             </tr>
         }
     </tbody>
