@@ -16,7 +16,9 @@
 
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server.Authentications;
+using WalkTrack.Framework.Server.Exceptions;
 using WalkTrack.UserService.Common;
+using WalkTrack.UserService.Common.Criteria;
 
 namespace WalkTrack.UserService.Server.Services;
 
@@ -55,14 +57,44 @@ internal sealed class UserService: IUserService
         return _repository.Search(criteria, cancellationToken);
     }
 
-    public Task<User> Create(
+    public async Task<User> Create(
         User resource,
         CancellationToken cancellationToken = default
     )
     {
+        if(
+            (
+                await _repository.Search(
+                    new ICriterion[] {
+                        new EmailCriterion(resource.Email)
+                    },
+                    cancellationToken
+                )
+            )
+                .Any()
+        )
+        {
+            throw new InvalidRequestException("Email already exists");
+        }
+
+        if(
+            (
+                await _repository.Search(
+                    new ICriterion[] {
+                        new UsernameCriterion(resource.Username)
+                    },
+                    cancellationToken
+                )
+            )
+                .Any()
+        )
+        {
+            throw new InvalidRequestException("Email already exists");
+        }
+
         string salt = Guid.NewGuid().ToString();
 
-        return _repository.Create(
+        return await _repository.Create(
             resource with {
                 Id = Guid.NewGuid().ToString(),
                 Salt = salt,

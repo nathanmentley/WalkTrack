@@ -26,6 +26,7 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
 {
     private static readonly IEnumerable<ICriterionHandler> Handlers =
         new ICriterionHandler[] {
+            new EmailCriterionHandler(),
             new IdCriterionHandler(),
             new UsernameCriterionHandler()
         };

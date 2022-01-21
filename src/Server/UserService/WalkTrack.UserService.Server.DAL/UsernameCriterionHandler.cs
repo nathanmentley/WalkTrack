@@ -15,8 +15,8 @@
 */
 
 using SqlKata;
-using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
+using WalkTrack.UserService.Common.Criteria;
 
 namespace WalkTrack.UserService.Server.DAL;
 

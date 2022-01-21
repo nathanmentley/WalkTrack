@@ -15,34 +15,13 @@
 */
 
 using SqlKata;
-using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.Exceptions;
+using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
+using WalkTrack.UserService.Common.Criteria;
 
-namespace WalkTrack.Framework.Server.DAL.Mssql.Criteria;
+namespace WalkTrack.UserService.Server.DAL;
 
-public class CriterionProcessor
+internal class EmailCriterionHandler : AbstractCriterionHandler<EmailCriterion>
 {
-    private readonly IEnumerable<ICriterionHandler> _handlers;
-
-    public CriterionProcessor(IEnumerable<ICriterionHandler> handlers)
-    {
-        if (handlers is null)
-        {
-            throw new ArgumentNullException(nameof(handlers));
-        }
-
-        _handlers = handlers;
-    }
-
-    public Query Handle(ICriterion critierion, Query query)
-    {
-        ICriterionHandler? handler = _handlers.FirstOrDefault(handler => handler.CanHandle(critierion));
-
-        if (handler is null)
-        {
-            throw new InvalidRequestException("TODO");
-        }
-
-        return handler.Handle(critierion, query);
-    }
+    protected override Query Handle(EmailCriterion criterion, Query query) =>
+        query.Where("Email", criterion.Email);
 }

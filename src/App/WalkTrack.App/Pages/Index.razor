@@ -25,16 +25,31 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>@model.Goal.Name</h1>
-
-<p>Ran @model.Distance miles of @model.FinishLine</p>
-
 <select @onchange="ChangeGoal" class="form-select">
     @foreach (Goal goal in model.Goals)
     {
         <option value="@goal.Id">@goal.Name</option>
     }
 </select>
+
+<div class="container p-4">
+    <div class="row">
+        <div class="col-lg">
+            <p>Completed @model.Distance miles of @model.FinishLine</p>
+        </div>
+
+        <div class="col-lg">
+            @if (model.NextMilestone is not null)
+            {
+                <p>"@model.NextMilestone.Name" is @(model.NextMilestone.Distance - model.Distance) miles away</p>
+            }
+            else
+            {
+                <p>Goal Completed</p>
+            }
+        </div>
+    </div>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -70,7 +85,7 @@
             try
             {
                 model.Goals = (await GoalClient.Search())
-                    .OrderBy(goal => string.IsNullOrWhiteSpace(goal.UserId))
+                    .OrderByDescending(goal => string.IsNullOrWhiteSpace(goal.UserId))
                     .ThenBy(goal => goal.Sort);
 
                 model.Entries = await EntryClient.Search();

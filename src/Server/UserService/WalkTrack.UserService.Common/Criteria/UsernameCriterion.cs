@@ -14,7 +14,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace WalkTrack.Framework.Common.Criteria;
+using WalkTrack.Framework.Common.Criteria;
+
+namespace WalkTrack.UserService.Common.Criteria;
 
 public sealed class UsernameCriterion: ICriterion
 {

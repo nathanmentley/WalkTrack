@@ -114,6 +114,7 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)
+            .WithErrorHandler(new InvalidRequestErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<CreateUserRequest, User>(_httpClient, cancellationToken);

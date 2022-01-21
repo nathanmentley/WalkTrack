@@ -22,6 +22,7 @@ using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server;
 using WalkTrack.Framework.Server.Exceptions;
 using WalkTrack.UserService.Common;
+using WalkTrack.UserService.Common.Criteria;
 using WalkTrack.UserService.Server.Configuration;
 
 namespace WalkTrack.UserService.Server.Services;

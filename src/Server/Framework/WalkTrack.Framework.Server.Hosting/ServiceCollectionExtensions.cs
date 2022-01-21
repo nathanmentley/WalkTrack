@@ -41,7 +41,7 @@ public static class ServiceCollectionExtensions
             .AddSingleton<ITranscoder, ApiErrorResponseJsonV1Transcoder>()
             .AddSingleton<ITranscoderProcessor, TranscoderProcessor>()
 
-            .AddSingleton<IExceptionHandler, InvalidQueryRequestExceptionHandler>()
+            .AddSingleton<IExceptionHandler, InvalidRequestExceptionHandler>()
             .AddSingleton<IExceptionHandler, MissingBodyExceptionHandler>()
             .AddSingleton<IExceptionHandler, MissingQueryStringExceptionHandler>()
             .AddSingleton<IExceptionHandler, MissingRouteParameterExceptionHandler>()

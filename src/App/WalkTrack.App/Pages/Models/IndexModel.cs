@@ -32,4 +32,12 @@ public class IndexModel
         Goal.Milestones.Any() ?
             Goal.Milestones.Max(milestone => milestone.Distance):
             decimal.Zero;
+
+    public Milestone? NextMilestone =>
+        Goal.Milestones.Any() ?
+            Goal.Milestones
+                .Where(milestone => milestone.Distance > Distance)
+                .OrderBy(milestone => milestone.Distance)
+                .FirstOrDefault():
+            null;
 }

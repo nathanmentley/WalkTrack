@@ -14,28 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using System.Linq.Expressions;
-using CouchDB.Driver.Types;
-using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.Exceptions;
+using WalkTrack.Framework.Client.Exceptions;
+using WalkTrack.Framework.Common.ApiErrorResponses;
 
-namespace WalkTrack.Framework.Server.DAL.CouchDb.Criteria;
+namespace WalkTrack.Framework.Client;
 
-public abstract class AbstractCriterionHandler<TCriterion, TPersisted> : ICriterionHandler<TPersisted>
-    where TCriterion: ICriterion
-    where TPersisted: CouchDocument
+public class InvalidRequestErrorHandler: IErrorHandler
 {
-    public bool CanHandle(ICriterion criterion) => criterion is TCriterion;
+    public bool CanHandle(ApiErrorResponse apiError) =>
+        apiError.StatusCode == 400;
 
-    public Expression<Func<TPersisted, bool>> Handle(ICriterion criterion)
-    {
-        if (criterion is TCriterion typedCriterion)
-        {
-            return Handle(typedCriterion);
-        }
-
-        throw new InvalidRequestException("TODO");
-    }
-
-    protected abstract Expression<Func<TPersisted, bool>> Handle(TCriterion criterion);
+    public Exception Handle(ApiErrorResponse apiError) =>
+        new InvalidRequestException(apiError.Message);
 }

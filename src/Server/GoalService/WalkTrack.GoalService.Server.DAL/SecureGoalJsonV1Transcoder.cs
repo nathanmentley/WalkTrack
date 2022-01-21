@@ -41,6 +41,7 @@ internal sealed class SecureGoalJsonV1Transcoder: BaseJsonTranscoder<Goal>, ITra
             .With("id", resource.Id)
             .With("userId", resource.UserId)
             .With("name", resource.Name)
+            .With("sort", resource.Sort)
             .With(
                 "milestones",
                 new JsonArrayBuilder()
@@ -63,6 +64,7 @@ internal sealed class SecureGoalJsonV1Transcoder: BaseJsonTranscoder<Goal>, ITra
             Id = GetValue(jsonObject, "id", string.Empty),
             UserId = GetValue(jsonObject, "userId", string.Empty),
             Name = GetValue(jsonObject, "name", string.Empty),
+            Sort = GetValue(jsonObject, "sort", 0),
             Milestones = GetMilestones(jsonObject["milestones"] as JsonArray)
         };
 

@@ -21,10 +21,10 @@ using WalkTrack.Framework.Server.Exceptions;
 namespace WalkTrack.Framework.Server.Hosting.ExceptionFilters;
 
 /// <summary>
-/// An excpetion handler for <see cref="InvalidQueryRequestException"/>
+/// An excpetion handler for <see cref="InvalidRequestException"/>
 /// </summary>
 [ExcludeFromCodeCoverage]
-internal sealed class InvalidQueryRequestExceptionHandler: IExceptionHandler
+internal sealed class InvalidRequestExceptionHandler: IExceptionHandler
 {
     /// <summary>
     /// The http status code to be returned from this handler
@@ -41,12 +41,12 @@ internal sealed class InvalidQueryRequestExceptionHandler: IExceptionHandler
     /// true, if the exception can be handled
     /// </returns>
     public bool CanHandle(Exception exception) =>
-        exception is InvalidQueryRequestException;
+        exception is InvalidRequestException;
 
     public ApiErrorResponse BuildErrorResponse(Exception exception) =>
         new ApiErrorResponse()
         {
             StatusCode = StatusCode,
-            Message = "Requested resource not found."
+            Message = $"Invalid request: {exception.Message}"
         };
 }

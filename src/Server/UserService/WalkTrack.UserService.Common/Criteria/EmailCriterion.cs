@@ -14,35 +14,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using SqlKata;
 using WalkTrack.Framework.Common.Criteria;
-using WalkTrack.Framework.Server.Exceptions;
 
-namespace WalkTrack.Framework.Server.DAL.Mssql.Criteria;
+namespace WalkTrack.UserService.Common.Criteria;
 
-public class CriterionProcessor
+public sealed class EmailCriterion: ICriterion
 {
-    private readonly IEnumerable<ICriterionHandler> _handlers;
+    public string Email { get; }
 
-    public CriterionProcessor(IEnumerable<ICriterionHandler> handlers)
+    public EmailCriterion(string email)
     {
-        if (handlers is null)
+        if (string.IsNullOrWhiteSpace(email))
         {
-            throw new ArgumentNullException(nameof(handlers));
+            throw new ArgumentNullException(nameof(email));
         }
 
-        _handlers = handlers;
-    }
-
-    public Query Handle(ICriterion critierion, Query query)
-    {
-        ICriterionHandler? handler = _handlers.FirstOrDefault(handler => handler.CanHandle(critierion));
-
-        if (handler is null)
-        {
-            throw new InvalidRequestException("TODO");
-        }
-
-        return handler.Handle(critierion, query);
+        Email = email;
     }
 }

@@ -32,7 +32,7 @@ public abstract class AbstractCriterionHandler<TCriterion> : ICriterionHandler
             return Handle(typedCriterion, query);
         }
 
-        throw new InvalidQueryRequestException();
+        throw new InvalidRequestException("TODO");
     }
 
     protected abstract Query Handle(TCriterion criterion, Query query);

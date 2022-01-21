@@ -42,7 +42,7 @@ public class CriterionProcessor<TPersisted>
 
         if (handler is null)
         {
-            throw new InvalidQueryRequestException();
+            throw new InvalidRequestException("TODO");
         }
 
         return handler.Handle(critierion);

@@ -21,7 +21,7 @@ namespace WalkTrack.Framework.Server.Exceptions;
 /// <summary>
 /// </summary>
 [ExcludeFromCodeCoverage]
-public sealed class InvalidQueryRequestException: BaseServerWalkTrackException
+public sealed class InvalidRequestException: BaseServerWalkTrackException
 {
     /// <summary>
     /// Constructor
@@ -32,7 +32,7 @@ public sealed class InvalidQueryRequestException: BaseServerWalkTrackException
     /// <param name="innerException">
     /// Another exception that brought this exception to light.
     /// </param>
-    public InvalidQueryRequestException(string message, Exception innerException):
+    public InvalidRequestException(string message, Exception innerException):
         base(message, innerException) {}
 
     /// <summary>
@@ -41,12 +41,12 @@ public sealed class InvalidQueryRequestException: BaseServerWalkTrackException
     /// <param name="message">
     /// A message describing the exceptional situation in detail.
     /// </param>
-    public InvalidQueryRequestException(string message):
+    public InvalidRequestException(string message):
         base(message) {}
 
     /// <summary>
     /// Constructor
     /// </summary>
-    public InvalidQueryRequestException():
+    public InvalidRequestException():
         base() {}
 }
