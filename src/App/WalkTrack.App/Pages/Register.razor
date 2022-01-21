@@ -67,29 +67,6 @@
 </div>
 
 @code {
-    private class RegisterModel
-    {
-        public string Username { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public bool Loading { get; set; } = false;
-
-        public CreateUserRequest ToCreateRequest() =>
-            new CreateUserRequest()
-            {
-                Username = Username,
-                Email = Email,
-                IsPublic = false,
-                Password = Password
-            };
-
-        public AuthenticateRequest ToLoginRequest() =>
-            new AuthenticateRequest()
-            {
-                Username = Username,
-                Password = Password
-            };
-    }
     private RegisterModel model = new RegisterModel();
 
     protected override async Task OnInitializedAsync()

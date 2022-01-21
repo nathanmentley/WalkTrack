@@ -57,20 +57,6 @@
 </table>
 
 @code {
-    private class IndexModel
-    {
-        public IEnumerable<Goal> Goals { get; set; } = Enumerable.Empty<Goal>();
-        public IEnumerable<Entry> Entries { get; set; } = Enumerable.Empty<Entry>();
-
-        public Goal Goal { get; set; } = new Goal();
-
-        public decimal Distance => Entries.Sum(entry => entry.Distance);
-
-        public decimal FinishLine => 
-            Goal.Milestones.Any() ?
-                Goal.Milestones.Max(milestone => milestone.Distance):
-                decimal.Zero;
-    }
     private readonly IndexModel model = new IndexModel();
 
     protected override async Task OnInitializedAsync()

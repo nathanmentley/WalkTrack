@@ -84,26 +84,6 @@
 </table>
 
 @code {
-    private class GoalModel
-    {
-        public string Name { get; set; } = string.Empty;
-
-        public bool Collapsed { get; set; } = true;
-        public bool Loading { get; set; } = false;
-
-        public IEnumerable<Goal> Goals { get; private set; } = Enumerable.Empty<Goal>();
-
-        public void SetGoals(IEnumerable<Goal> goals)
-        {
-            Goals = goals;
-        }
-
-        public Goal ToGoal() =>
-            new Goal()
-            {
-                Name = Name
-            };
-    }
     private readonly GoalModel model = new GoalModel();
 
     protected override async Task OnInitializedAsync()
