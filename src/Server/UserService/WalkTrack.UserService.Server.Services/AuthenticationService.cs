@@ -19,12 +19,14 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using WalkTrack.EmailService.Client;
+using WalkTrack.EmailService.Common;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server;
 using WalkTrack.Framework.Server.Exceptions;
 using WalkTrack.UserService.Common;
 using WalkTrack.UserService.Common.Criteria;
 using WalkTrack.UserService.Server.Configuration;
+using WalkTrack.UserService.Server.Criteria;
 
 namespace WalkTrack.UserService.Server.Services;
 
@@ -178,22 +180,80 @@ internal sealed class AuthenticationService: IAuthenticationService
 
     /// <summary>
     /// </summary>
-    public Task RequestForgottenPassword(
+    public async Task RequestForgottenPassword(
         ForgotPasswordRequest request,
         CancellationToken cancellationToken = default
     )
     {
-        throw new NotImplementedException();
+        IEnumerable<User> users = await _repository.Search(
+            new []
+            {
+                new EmailCriterion(request.Email)
+            },
+            cancellationToken
+        );
+
+        User? user = users.FirstOrDefault();
+
+        if (user is null)
+        {
+            return;
+        }
+
+        user = user with {
+            ResetToken = Guid.NewGuid().ToString(),
+            ResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30)
+        };
+
+        user = await _repository.Update(user, cancellationToken);
+
+        await _emailClient.Send(
+            new [] {
+                new Email()
+                {
+                    To = user.Username,
+                    ToAddress = request.Email,
+                    From = "WalkTrack",
+                    FromAddress = "noreply@Walktrack.PokeTriRx.com",
+                    Subject = "Password Reset Request",
+                    HtmlMessage = $"Token: {user.ResetToken}",
+                    TextMessage = $"Token: {user.ResetToken}"
+                }
+            },
+            cancellationToken
+        );
     }
 
     /// <summary>
     /// </summary>
-    public Task<AuthenticateResponse> ResetPassword(
+    public async Task<AuthenticateResponse> ResetPassword(
         ResetPasswordRequest request,
         CancellationToken cancellationToken = default
     )
     {
-        throw new NotImplementedException();
+        IEnumerable<User> users = await _repository.Search(
+            new ICriterion[]
+            {
+                new EmailCriterion(request.Email),
+                new ResetTokenCriterion(request.Token)
+            },
+            cancellationToken
+        );
+
+        User? user = users.FirstOrDefault();
+
+        if (user is null)
+        {
+            throw new Exception("TODO");
+        }
+
+        string salt = Guid.NewGuid().ToString();
+
+        user = user with { Password = _hashingUtility.Hash(request.Password, salt), Salt = salt };
+
+        await _repository.Update(user, cancellationToken);
+
+        return BuildResponse(user, request.Password);
     }
 
     private AuthenticateResponse BuildResponse(User user, string password)

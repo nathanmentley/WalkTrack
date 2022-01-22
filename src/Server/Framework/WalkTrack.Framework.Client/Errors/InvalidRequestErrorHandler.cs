@@ -25,5 +25,5 @@ public class InvalidRequestErrorHandler: IErrorHandler
         apiError.StatusCode == 400;
 
     public Exception Handle(ApiErrorResponse apiError) =>
-        new InvalidRequestException(apiError.Message);
+        new InvalidRequestClientException(apiError.Message);
 }

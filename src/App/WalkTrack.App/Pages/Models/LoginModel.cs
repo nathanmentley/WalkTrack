@@ -18,7 +18,7 @@ using WalkTrack.UserService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 
-public class LoginModel
+public sealed class LoginModel
 {
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;

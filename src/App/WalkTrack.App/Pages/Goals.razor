@@ -106,15 +106,15 @@
             {
                 await GoalClient.Delete(goal);
             }
-            catch(UnauthorizedException)
+            catch(UnauthorizedClientException)
             {
                 NavigationManager.NavigateTo("/account/login");
             }
-            catch(ForbiddenException)
+            catch(ForbiddenClientException)
             {
                 await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
             }
-            catch(UnhandledResponseErrorException)
+            catch(UnhandledResponseErrorClientException)
             {
                 await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
             }
@@ -131,15 +131,15 @@
         {
             await GoalClient.Create(model.ToGoal());
         }
-        catch(UnauthorizedException)
+        catch(UnauthorizedClientException)
         {
             NavigationManager.NavigateTo("/account/login");
         }
-        catch(ForbiddenException)
+        catch(ForbiddenClientException)
         {
             await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
         }
-        catch(UnhandledResponseErrorException)
+        catch(UnhandledResponseErrorClientException)
         {
             await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
         }
@@ -156,15 +156,15 @@
         {
             model.SetGoals((await GoalClient.Search()).Where(goal => !string.IsNullOrWhiteSpace(goal.UserId)));
         }
-        catch(UnauthorizedException)
+        catch(UnauthorizedClientException)
         {
             NavigationManager.NavigateTo("/account/login");
         }
-        catch(ForbiddenException)
+        catch(ForbiddenClientException)
         {
             await JSRuntime.InvokeAsync<object>("alert", "Cannot complete the action. Access denied.");
         }
-        catch(UnhandledResponseErrorException)
+        catch(UnhandledResponseErrorClientException)
         {
             await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
         }

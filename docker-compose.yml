@@ -77,6 +77,7 @@ services:
         WalktrackEnvironment: ${WALKTRACK_ENVIRONMENT}
     environment:
     - AuthenticationSettings__JwtSecret=${JWT_SECRET}
+    - ConnectionSettings__ApiKey=${SENDGRID_API_KEY}
     expose:
     - 8003
     restart: unless-stopped

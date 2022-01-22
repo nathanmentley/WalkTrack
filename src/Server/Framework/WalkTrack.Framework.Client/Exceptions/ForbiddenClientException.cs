@@ -21,7 +21,7 @@ namespace WalkTrack.Framework.Client.Exceptions;
 /// <summary>
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class UnauthorizedException: BaseClientWalkTrackException
+public class ForbiddenClientException: BaseClientWalkTrackException
 {
     /// <summary>
     /// Constructor
@@ -32,7 +32,7 @@ public class UnauthorizedException: BaseClientWalkTrackException
     /// <param name="innerException">
     /// Another exception that brought this exception to light.
     /// </param>
-    public UnauthorizedException(string message, Exception innerException):
+    public ForbiddenClientException(string message, Exception innerException):
         base(message, innerException) {}
 
     /// <summary>
@@ -41,12 +41,12 @@ public class UnauthorizedException: BaseClientWalkTrackException
     /// <param name="message">
     /// A message describing the exceptional situation in detail.
     /// </param>
-    public UnauthorizedException(string message):
+    public ForbiddenClientException(string message):
         base(message) {}
 
     /// <summary>
     /// Constructor
     /// </summary>
-    public UnauthorizedException():
+    public ForbiddenClientException():
         base() {}
 }

@@ -15,17 +15,12 @@
 */
 
 using System.Diagnostics.CodeAnalysis;
-using WalkTrack.Framework.Common.Resources;
 
 namespace WalkTrack.EmailService.Common;
 
 [ExcludeFromCodeCoverage]
-public sealed record Email: IResource
+public sealed record Email
 {
-    /// <summary>
-    /// </summary>
-    public string Id { get; init; } = string.Empty;
-
     /// <summary>
     /// </summary>
     public string From { get; init; } = string.Empty;

@@ -19,7 +19,7 @@ using WalkTrack.GoalService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 
-public class GoalModel
+public sealed class GoalModel
 {
     public string Name { get; set; } = string.Empty;
 

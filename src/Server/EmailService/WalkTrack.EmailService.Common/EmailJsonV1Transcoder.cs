@@ -37,7 +37,6 @@ internal sealed class EmailJsonV1Transcoder: BaseJsonTranscoder<Email>, ITransco
 
     public override JsonObject Encode(Email resource) =>
         new JsonObjectBuilder()
-            .With("id", resource.Id)
             .With("from", resource.From)
             .With("fromAddress", resource.FromAddress)
             .With("to", resource.To)
@@ -50,7 +49,6 @@ internal sealed class EmailJsonV1Transcoder: BaseJsonTranscoder<Email>, ITransco
     public override Email Decode(JsonObject jsonObject) =>
         new Email()
         {
-            Id = GetValue(jsonObject, "id", string.Empty),
             From = GetValue(jsonObject, "from", string.Empty),
             FromAddress = GetValue(jsonObject, "fromAddress", string.Empty),
             To = GetValue(jsonObject, "to", string.Empty),

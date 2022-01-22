@@ -18,7 +18,7 @@ using WalkTrack.EntryService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 
-public class EntryModel
+public sealed class EntryModel
 {
     public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
     public decimal Distance { get; set; } = 0;

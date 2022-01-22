@@ -25,5 +25,5 @@ public class UnauthorizedErrorHandler: IErrorHandler
         apiError.StatusCode == 401;
 
     public Exception Handle(ApiErrorResponse apiError) =>
-        new UnauthorizedException();
+        new UnauthorizedClientException();
 }

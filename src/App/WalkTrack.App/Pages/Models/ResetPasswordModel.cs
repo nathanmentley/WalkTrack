@@ -14,16 +14,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.Framework.Client.Exceptions;
-using WalkTrack.Framework.Common.ApiErrorResponses;
+using WalkTrack.UserService.Common;
 
-namespace WalkTrack.Framework.Client;
+namespace WalkTrack.App.Pages.Models;
 
-public class ForbiddenErrorHandler: IErrorHandler
+public sealed class ResetPasswordModel
 {
-    public bool CanHandle(ApiErrorResponse apiError) =>
-        apiError.StatusCode == 403;
+    public string Password { get; set; } = string.Empty;
 
-    public Exception Handle(ApiErrorResponse apiError) =>
-        new ForbiddenClientException();
+    public bool Loading { get; set; } = false;
+
+    public ResetPasswordRequest ToResetPasswordRequest(string email, string resetToken) =>
+        new ResetPasswordRequest()
+        {
+            Password = Password,
+            Token = resetToken,
+            Email = email
+        };
 }

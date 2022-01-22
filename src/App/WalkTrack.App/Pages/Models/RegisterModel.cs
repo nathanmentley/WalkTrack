@@ -18,7 +18,7 @@ using WalkTrack.UserService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 
-public class RegisterModel
+public sealed class RegisterModel
 {
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

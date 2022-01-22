@@ -21,7 +21,7 @@ namespace WalkTrack.Framework.Client.Exceptions;
 /// <summary>
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class ResourceNotFoundException: BaseClientWalkTrackException
+public class UnhandledResponseErrorClientException: BaseClientWalkTrackException
 {
     /// <summary>
     /// Constructor
@@ -32,7 +32,7 @@ public class ResourceNotFoundException: BaseClientWalkTrackException
     /// <param name="innerException">
     /// Another exception that brought this exception to light.
     /// </param>
-    public ResourceNotFoundException(string message, Exception innerException):
+    public UnhandledResponseErrorClientException(string message, Exception innerException):
         base(message, innerException) {}
 
     /// <summary>
@@ -41,12 +41,12 @@ public class ResourceNotFoundException: BaseClientWalkTrackException
     /// <param name="message">
     /// A message describing the exceptional situation in detail.
     /// </param>
-    public ResourceNotFoundException(string message):
+    public UnhandledResponseErrorClientException(string message):
         base(message) {}
 
     /// <summary>
     /// Constructor
     /// </summary>
-    public ResourceNotFoundException():
+    public UnhandledResponseErrorClientException():
         base() {}
 }

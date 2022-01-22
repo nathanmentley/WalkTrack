@@ -18,7 +18,7 @@ using WalkTrack.GoalService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 
-public class MilestoneModel
+public sealed class MilestoneModel
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

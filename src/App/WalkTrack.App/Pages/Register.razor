@@ -92,13 +92,13 @@
 
             NavigationManager.NavigateTo("");
         }
-        catch(InvalidRequestException invalidRequestException)
+        catch(InvalidRequestClientException invalidRequestException)
         {
             await JSRuntime.InvokeAsync<object>("alert", invalidRequestException.Message);
 
             model.Loading = false;
         }
-        catch(UnhandledResponseErrorException)
+        catch(UnhandledResponseErrorClientException)
         {
             await JSRuntime.InvokeAsync<object>("alert", "An unknown error occured");
 

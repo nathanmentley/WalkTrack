@@ -25,5 +25,5 @@ public class ResourceNotFoundErrorHandler: IErrorHandler
         apiError.StatusCode == 404;
 
     public Exception Handle(ApiErrorResponse apiError) =>
-        new ResourceNotFoundException();
+        new ResourceNotFoundClientException();
 }

@@ -19,7 +19,7 @@ using WalkTrack.GoalService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 
-public class IndexModel
+public sealed class IndexModel
 {
     public IEnumerable<Goal> Goals { get; set; } = Enumerable.Empty<Goal>();
     public IEnumerable<Entry> Entries { get; set; } = Enumerable.Empty<Entry>();
