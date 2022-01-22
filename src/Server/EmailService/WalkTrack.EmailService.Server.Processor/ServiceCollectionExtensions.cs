@@ -15,9 +15,8 @@
 */
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using WalkTrack.Framework.Common.Resources;
 
-namespace WalkTrack.UserService.Common;
+namespace WalkTrack.EmailService.Server.Processor;
 
 /// <summary>
 /// </summary>
@@ -26,16 +25,8 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WtihUserTranscoders(this IServiceCollection collection) =>
+    public static IServiceCollection WithEmailProcessor(this IServiceCollection collection) =>
         collection
-            .AddSingleton<ITranscoder, AuthenticateRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, AuthenticateResponseJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, CreateUserRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, ForgotPasswordRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, ResetPasswordRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, TokenJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, UpdatePasswordRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, UserJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, UserCollectionJsonV1Transcoder>()
+            .AddSingleton<IEmailProcessor, EmailProcessor>()
         ;
 }

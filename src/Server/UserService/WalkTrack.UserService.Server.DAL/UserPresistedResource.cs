@@ -26,4 +26,6 @@ internal sealed class UserPresistedResource: BasePresistedResource
     internal bool IsPublic { get; init; } = false;
     internal string Password { get; init; } = string.Empty;
     internal string Salt { get; init; } = string.Empty;
+    internal string ResetToken { get; init; } = string.Empty;
+    internal DateTime ResetTokenExpiresAtUtc { get; init; } = DateTime.MinValue;
 }

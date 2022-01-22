@@ -68,6 +68,19 @@ services:
       - BACKUP_AGE=7
       - PACK=tar
 
+  emailservice:
+    container_name: emailservice
+    build:
+      context: .
+      dockerfile: src/Server/EmailService/dockerfile
+      args:
+        WalktrackEnvironment: ${WALKTRACK_ENVIRONMENT}
+    environment:
+    - AuthenticationSettings__JwtSecret=${JWT_SECRET}
+    expose:
+    - 8003
+    restart: unless-stopped
+
   entryservice:
     container_name: entryservice
     build:
@@ -120,6 +133,7 @@ services:
     - 8000
     depends_on:
     - mssql
+    - emailservice
     restart: unless-stopped
 
   app:

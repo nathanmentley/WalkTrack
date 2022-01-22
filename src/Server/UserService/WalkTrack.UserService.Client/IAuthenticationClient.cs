@@ -24,6 +24,10 @@ public interface IAuthenticationClient
 
     Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default);
 
+    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
+
+    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+
     Task Login(Token token, CancellationToken cancellationToken = default);
 
     Task Logout(CancellationToken cancellationToken = default);

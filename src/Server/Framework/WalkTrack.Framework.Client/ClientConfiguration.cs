@@ -14,27 +14,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+namespace WalkTrack.Framework.Client;
 
-namespace WalkTrack.UserService.Server;
-
-/// <summary>
-/// </summary>
-public interface IAuthenticationService
+public sealed class ClientConfiguration
 {
     /// <summary>
     /// </summary>
-    Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<Token> RefreshToken(Token token, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+    public string Url { get; set; } = string.Empty;
 }

@@ -21,35 +21,32 @@ using WalkTrack.UserService.Common;
 namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[Route("v1/authenticate")]
-public sealed class AuthenticateV1Controller
+[Route("v1/password/forgot")]
+public sealed class RequestForgottenPasswordV1Controller
 {
     private readonly IAuthenticationService _service;
 
-    public AuthenticateV1Controller(IAuthenticationService service)
+    public RequestForgottenPasswordV1Controller(IAuthenticationService service)
     {
         _service = service ??
             throw new ArgumentNullException(nameof(service));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Authenticate(
-        [FromBody] AuthenticateRequest request,
+    public async Task<IActionResult> ForgottenPassword(
+        [FromBody] ForgotPasswordRequest request,
         CancellationToken cancellationToken
     )
     {
         if (request is null)
         {
-            throw new MissingBodyException($"{nameof(request)} is required for {nameof(Authenticate)}.");
+            throw new MissingBodyException($"{nameof(request)} is required for {nameof(ForgottenPassword)}.");
         }
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        AuthenticateResponse response = await _service.Authenticate(request, cancellationToken);
+        await _service.RequestForgottenPassword(request, cancellationToken);
 
-        return new ObjectResult(response)
-        {
-            StatusCode = StatusCodes.Status201Created
-        };
+        return new NoContentResult();
     }
 }

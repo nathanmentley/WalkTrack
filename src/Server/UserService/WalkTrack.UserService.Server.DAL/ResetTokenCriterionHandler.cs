@@ -14,27 +14,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+using SqlKata;
+using WalkTrack.UserService.Server.Criteria;
+using WalkTrack.Framework.Server.DAL.Mssql.Criteria;
 
-namespace WalkTrack.UserService.Server;
+namespace WalkTrack.UserService.Server.DAL;
 
-/// <summary>
-/// </summary>
-public interface IAuthenticationService
+internal class ResetTokenCriterionHandler : AbstractCriterionHandler<ResetTokenCriterion>
 {
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<Token> RefreshToken(Token token, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+    protected override Query Handle(ResetTokenCriterion criterion, Query query) =>
+        query.Where("ResetToken", criterion.ResetToken);
 }

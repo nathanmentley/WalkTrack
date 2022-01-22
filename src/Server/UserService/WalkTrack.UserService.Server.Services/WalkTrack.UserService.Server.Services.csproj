@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\EmailService\WalkTrack.EmailService.Client\WalkTrack.EmailService.Client.csproj" />
     <ProjectReference Include="..\WalkTrack.UserService.Server\WalkTrack.UserService.Server.csproj" />
   </ItemGroup>
 

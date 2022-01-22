@@ -27,22 +27,6 @@ internal sealed class EntryClient: BaseClient, IEntryClient
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
-    private static readonly WalkTrackMediaType _entryMediaType =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.Entry")
-            .WithVersion(1)
-            .Build();
-
-    private static readonly WalkTrackMediaType _entriesMediaType =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.Entries")
-            .WithVersion(1)
-            .Build();
-
     public EntryClient(string url, ITranscoderProcessor transcoder)
     {
         _transcoder = transcoder ??
@@ -63,7 +47,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
                     .AppendPathSegment("entry")
                     .AppendPathSegment(id)
             )
-            .WithAcceptType(_entryMediaType)
+            .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
@@ -79,7 +63,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
                     .AppendPathSegment("v1")
                     .AppendPathSegment("entry")
             )
-            .WithAcceptType(_entriesMediaType)
+            .WithAcceptType(MediaTypes.Entries)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
             .WithErrorHandler(new ForbiddenErrorHandler())
@@ -89,14 +73,14 @@ internal sealed class EntryClient: BaseClient, IEntryClient
     public async Task<Entry> Create(Entry entry, CancellationToken cancellationToken = default) =>
         await new RequestBuilder(_transcoder)
             .WithBody(entry)
-            .WithContentTypes(_entryMediaType)
+            .WithContentTypes(MediaTypes.Entry)
             .WithMethod(HttpMethod.Post)
             .WithUrl(
                 new Url()
                     .AppendPathSegment("v1")
                     .AppendPathSegment("entry")
             )
-            .WithAcceptType(_entryMediaType)
+            .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
             .WithErrorHandler(new ForbiddenErrorHandler())
@@ -106,7 +90,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
     public async Task Update(Entry entry, CancellationToken cancellationToken = default) =>
         await new RequestBuilder(_transcoder)
             .WithBody(entry)
-            .WithContentTypes(_entryMediaType)
+            .WithContentTypes(MediaTypes.Entry)
             .WithMethod(HttpMethod.Put)
             .WithUrl(
                 new Url()
@@ -129,7 +113,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
                     .AppendPathSegment("entry")
                     .AppendPathSegment(entry.Id)
             )
-            .WithAcceptType(_entryMediaType)
+            .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)
             .WithAuthToken(AuthenticationContext.Token)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())

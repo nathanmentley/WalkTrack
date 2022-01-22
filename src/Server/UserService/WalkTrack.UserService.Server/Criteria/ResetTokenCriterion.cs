@@ -14,27 +14,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+using WalkTrack.Framework.Common.Criteria;
 
-namespace WalkTrack.UserService.Server;
+namespace WalkTrack.UserService.Server.Criteria;
 
-/// <summary>
-/// </summary>
-public interface IAuthenticationService
+public sealed class ResetTokenCriterion: ICriterion
 {
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, CancellationToken cancellationToken = default);
+    public string ResetToken { get; }
 
-    /// <summary>
-    /// </summary>
-    Task<Token> RefreshToken(Token token, CancellationToken cancellationToken = default);
+    public ResetTokenCriterion(string resetToken)
+    {
+        if (string.IsNullOrWhiteSpace(resetToken))
+        {
+            throw new ArgumentNullException(nameof(resetToken));
+        }
 
-    /// <summary>
-    /// </summary>
-    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+        ResetToken = resetToken;
+    }
 }

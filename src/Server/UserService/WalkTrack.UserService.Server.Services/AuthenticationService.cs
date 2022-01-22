@@ -18,6 +18,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using WalkTrack.EmailService.Client;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server;
 using WalkTrack.Framework.Server.Exceptions;
@@ -33,6 +34,7 @@ internal sealed class AuthenticationService: IAuthenticationService
 {
     private readonly string _adminUsername;
     private readonly string _adminPassword;
+    private readonly IEmailClient _emailClient;
     private readonly IUserRepository _repository;
     private readonly IHashingUtility _hashingUtility;
     private readonly JwtSecurityTokenHandler _tokenHandler;
@@ -42,6 +44,7 @@ internal sealed class AuthenticationService: IAuthenticationService
     public AuthenticationService(
         IOptions<AdminSettings> adminSettings,
         IOptions<AuthenticationSettings> authenticationSettings,
+        IEmailClient emailClient,
         IUserRepository repository,
         IHashingUtility hashingUtility
     )
@@ -54,6 +57,11 @@ internal sealed class AuthenticationService: IAuthenticationService
         if (authenticationSettings is null)
         {
             throw new ArgumentNullException(nameof(authenticationSettings));
+        }
+
+        if (emailClient is null)
+        {
+            throw new ArgumentNullException(nameof(emailClient));
         }
 
         if (repository is null)
@@ -69,6 +77,8 @@ internal sealed class AuthenticationService: IAuthenticationService
         _adminUsername = adminSettings.Value.AdminUsername;
 
         _adminPassword = adminSettings.Value.AdminPassword;
+
+        _emailClient = emailClient;
 
         _repository = repository;
 
@@ -164,6 +174,26 @@ internal sealed class AuthenticationService: IAuthenticationService
         return Task.FromResult(
             new Token() { Id = GenerateJwtToken(idClaim.Value) }
         );
+    }
+
+    /// <summary>
+    /// </summary>
+    public Task RequestForgottenPassword(
+        ForgotPasswordRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// </summary>
+    public Task<AuthenticateResponse> ResetPassword(
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        throw new NotImplementedException();
     }
 
     private AuthenticateResponse BuildResponse(User user, string password)

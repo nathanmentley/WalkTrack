@@ -83,6 +83,52 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
         return response;
     }
 
+    public async Task RequestForgottenPassword(
+        ForgotPasswordRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(request)
+            .WithContentTypes(MediaTypes.ForgotPasswordRequest)
+            .WithMethod(HttpMethod.Post)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("password")
+                    .AppendPathSegment("forgot")
+            )
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
+            .Fetch<ForgotPasswordRequest>(_httpClient, cancellationToken);
+
+    public async Task<AuthenticateResponse> ResetPassword(
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        AuthenticateResponse response =
+            await new RequestBuilder(_transcoder)
+                .WithBody(request)
+                .WithContentTypes(MediaTypes.ResetPasswordRequest)
+                .WithMethod(HttpMethod.Post)
+                .WithUrl(
+                    new Url()
+                        .AppendPathSegment("v1")
+                        .AppendPathSegment("password")
+                        .AppendPathSegment("reset")
+                )
+                .WithAcceptType(MediaTypes.AuthenticateRequest)
+                .WithAcceptType(MediaTypes.ApiError)
+                .WithErrorHandler(new ForbiddenErrorHandler())
+                .WithErrorHandler(new UnauthorizedErrorHandler())
+                .Fetch<ResetPasswordRequest, AuthenticateResponse>(_httpClient, cancellationToken);
+
+        AuthenticationContext.Token = response.Id;
+
+        return response;
+    }
+
     public Task Login(Token token, CancellationToken cancellationToken = default)
     {
         AuthenticationContext.Token = token.Id;

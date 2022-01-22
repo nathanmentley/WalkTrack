@@ -15,6 +15,8 @@
 */
 
 using FluentMigrator.Runner;
+using WalkTrack.EmailService.Client;
+using WalkTrack.EmailService.Common;
 using WalkTrack.Framework.Server.Hosting;
 using WalkTrack.UserService.Common;
 using WalkTrack.UserService.Server.Configuration;
@@ -64,6 +66,13 @@ public static class Program
             .WithUserDAL()
             .WithUserServices(configuration)
 
+            .WtihEmailTranscoders()
+            .WtihEmailClient(
+                configuration
+                    .GetSection("EmailServiceSettings")
+                    .GetValue<string>("Url")
+            )
+
             .AddFluentMigratorCore()
             .ConfigureRunner(
                 runnerBuilder =>
@@ -76,5 +85,5 @@ public static class Program
                         )
                         .ScanIn(typeof(AuthenticateV1Controller).Assembly).For.Migrations()
             )
-            .AddLogging(lb => lb.AddFluentMigratorConsole());
+            .AddLogging(loggingBuilder => loggingBuilder.AddFluentMigratorConsole());
 }

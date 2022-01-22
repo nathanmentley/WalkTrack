@@ -28,6 +28,7 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
         new ICriterionHandler[] {
             new EmailCriterionHandler(),
             new IdCriterionHandler(),
+            new ResetTokenCriterionHandler(),
             new UsernameCriterionHandler()
         };
 
@@ -50,7 +51,9 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
             Email = resource.Email,
             IsPublic = resource.IsPublic,
             Password = resource.Password,
-            Salt = resource.Salt
+            Salt = resource.Salt,
+            ResetToken = resource.ResetToken,
+            ResetTokenExpiresAtUtc = resource.ResetTokenExpiresAt
         };
 
     protected override User FromRecord(UserPresistedResource record) =>
@@ -61,6 +64,8 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
             Email = record.Email,
             IsPublic = record.IsPublic,
             Password = record.Password,
-            Salt = record.Salt
+            Salt = record.Salt,
+            ResetToken = record.ResetToken,
+            ResetTokenExpiresAt = record.ResetTokenExpiresAtUtc
         };
 }
