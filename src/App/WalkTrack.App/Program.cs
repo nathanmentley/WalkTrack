@@ -46,8 +46,8 @@ builder.Services
         builder.Configuration.GetValue<string>("UserServiceUrl")
     )
 
-    .AddSingleton<AppAuthenticator, CachedAppAuthenticator>()
-    .AddSingleton<IAuthenticator>(sp => sp.GetRequiredService<CachedAppAuthenticator>())
+    .AddSingleton<AppAuthenticator, AppAuthenticator>()
+    .AddSingleton<IAuthenticator>(sp => sp.GetRequiredService<AppAuthenticator>())
 
     .AddBlazoredLocalStorage();
 

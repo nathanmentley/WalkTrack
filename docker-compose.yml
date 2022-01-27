@@ -14,23 +14,6 @@ services:
       - ./data/couchdb:/bitnami/couchdb
     restart: unless-stopped
 
-  couchdbbackup:
-    container_name: couchdbbackup
-    image: tiredofit/db-backup
-    volumes:
-      - ./data/backups/couchdb:/backup
-    environment:
-      - DB_TYPE=couch
-      - DB_HOST=couchdb
-      - DB_USER=${COUCHDB_USER}
-      - DB_PASS=${COUCHDB_PASSWORD}
-      - DB_DUMP_FREQ=1440
-      - DB_DUMP_BEGIN=0120
-      - DB_CLEANUP_TIME=10080
-      - MD5=TRUE
-      - COMPRESSION=XZ
-      - SPLIT_DB=FALSE
-
   mssql:
     container_name: mssql
     build:
@@ -51,23 +34,6 @@ services:
       - ./data/backups/mssql:/backup
     restart: unless-stopped
 
-  mssqlbackup:
-    container_name: mssqlbackup
-    image: bbtsoftwareag/mssql-backup
-    volumes:
-      - ./data/backups/mssql:/backup
-    environment:
-      - TZ=America/Detroit
-      - DB_SERVER=mssql
-      - DB_USER=SA
-      - DB_PASSWORD=${MSSQL_PASSWORD}
-      - "DB_NAMES=
-          UserDb"
-      - CRON_SCHEDULE=20 1 * * *
-      - BACKUP_CLEANUP=true
-      - BACKUP_AGE=7
-      - PACK=tar
-
   emailservice:
     container_name: emailservice
     build:
@@ -78,6 +44,7 @@ services:
     environment:
     - AuthenticationSettings__JwtSecret=${JWT_SECRET}
     - ConnectionSettings__ApiKey=${SENDGRID_API_KEY}
+    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
     expose:
     - 8003
     restart: unless-stopped
@@ -94,6 +61,7 @@ services:
     - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
     - DalSettings__Username=${COUCHDB_USER}
     - DalSettings__Password=${COUCHDB_PASSWORD}
+    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
     expose:
     - 8001
     depends_on:
@@ -112,6 +80,7 @@ services:
     - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
     - DalSettings__Username=${COUCHDB_USER}
     - DalSettings__Password=${COUCHDB_PASSWORD}
+    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
     expose:
     - 8002
     depends_on:
@@ -131,6 +100,7 @@ services:
     - AdminSettings__AdminUsername=${ADMIN_USERNAME}
     - AdminSettings__AdminPassword=${ADMIN_PASSWORD}
     - EmailServiceSettings__Url=http://emailservice:8003/
+    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
     expose:
     - 8000
     depends_on:

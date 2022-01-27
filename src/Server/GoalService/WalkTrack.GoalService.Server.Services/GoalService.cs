@@ -139,10 +139,7 @@ internal sealed class GoalService: IGoalService
     {
         if (authenticationContext is UserAuthenticationContext userAuthenticationContext)
         {
-            if (!string.Equals(record.UserId, userAuthenticationContext.UserId, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ResourceNotFoundException("TODO");
-            }
+            return record with { UserId = userAuthenticationContext.UserId };
         }
 
         return record;

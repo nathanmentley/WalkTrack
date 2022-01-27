@@ -18,6 +18,7 @@
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
 @inject AppAuthenticator AppAuthenticator
 
 <div class="card">
@@ -64,7 +65,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (await AppAuthenticator.IsLoggedIn())
+        if (await AppAuthenticator.IsLoggedIn(LocalStorageService))
         {
             NavigationManager.NavigateTo("");
         }
@@ -76,7 +77,7 @@
 
         try
         {
-            await AppAuthenticator.Login(model.ToLoginRequest());
+            await AppAuthenticator.Login(LocalStorageService, model.ToLoginRequest());
 
             NavigationManager.NavigateTo("");
         }
