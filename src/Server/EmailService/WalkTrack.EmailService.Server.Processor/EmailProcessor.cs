@@ -14,6 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using WalkTrack.EmailService.Common;
@@ -25,9 +26,9 @@ internal sealed class EmailProcessor : IEmailProcessor
 {
     private readonly ISendGridClient _client;
 
-    public EmailProcessor(ConnectionSettings connectionSettings)
+    public EmailProcessor(IOptions<ConnectionSettings> connectionSettings)
     {
-        _client = new SendGridClient(connectionSettings.ApiKey);
+        _client = new SendGridClient(connectionSettings.Value.ApiKey);
     }
 
     public async Task Send(IEnumerable<Email> emails, CancellationToken cancellationToken = default) =>
