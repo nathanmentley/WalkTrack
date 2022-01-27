@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WtihUserTranscoders(this IServiceCollection collection) =>
+    public static IServiceCollection WithUserTranscoders(this IServiceCollection collection) =>
         collection
             .AddSingleton<ITranscoder, AuthenticateRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, AuthenticateResponseJsonV1Transcoder>()

@@ -22,8 +22,9 @@ using WalkTrack.UserService.Common;
 
 namespace WalkTrack.UserService.Client;
 
-internal sealed class UserClient: BaseClient, IUserClient
+internal sealed class UserClient: BaseClient, IUserClient, IDisposable
 {
+    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
@@ -59,10 +60,13 @@ internal sealed class UserClient: BaseClient, IUserClient
             .WithVersion(1)
             .Build();
 
-    public UserClient(string url, ITranscoderProcessor transcoder)
+    public UserClient(string url, IAuthenticator authenicator, ITranscoderProcessor transcoder)
     {
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
+
+        _authenicator = authenicator ??
+            throw new ArgumentNullException(nameof(authenicator));
 
         _httpClient = new HttpClient()
         {
@@ -81,7 +85,7 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
@@ -97,7 +101,7 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAcceptType(_usersMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<IEnumerable<User>>(_httpClient, cancellationToken);
@@ -129,7 +133,7 @@ internal sealed class UserClient: BaseClient, IUserClient
                     .AppendPathSegment("v1")
                     .AppendPathSegment("user")
             )
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithAcceptType(MediaTypes.ApiError)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
@@ -147,7 +151,7 @@ internal sealed class UserClient: BaseClient, IUserClient
                     .AppendPathSegment("user")
             )
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
@@ -164,9 +168,12 @@ internal sealed class UserClient: BaseClient, IUserClient
             )
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
+
+    public void Dispose() =>
+        _httpClient.Dispose();
 }

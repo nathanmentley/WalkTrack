@@ -16,20 +16,57 @@
 
 @page "/account"
 
+@inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@inject IAuthenticationClient AuthenticationClient
-@inject ILocalStorageService LocalStorageService
+@inject IUserClient UserClient
+@inject AppAuthenticator AppAuthenticator
 
 <PageTitle>Account</PageTitle>
 
 <h1>Account</h1>
 
-<button class="btn btn-primary" @onclick="Logout">Logout</button>
+<div>
+    <button class="btn btn-primary" @onclick="Logout">Logout</button>
+</div>
+
+<div>
+    <button class="btn btn-primary" @onclick="Delete">Delete Account</button>
+</div>
+
+<div class="card">
+    <h4 class="card-header">ChangePassword</h4>
+    <div class="card-body">
+        <EditForm Model="@model" OnValidSubmit="ChangePassword">
+            <DataAnnotationsValidator />
+
+            <div class="container">
+                <div class="row">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <InputText @bind-Value="model.Password" type="password" class="form-control" />
+                        <ValidationMessage For="@(() => model.Password)" />
+                    </div>
+                </div>
+                <div class="row p-3">
+                    <button disabled="@model.Loading" class="btn btn-primary">
+                        @if (model.Loading) 
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>
+                        }
+                        Change Password
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
 
 @code {
+    private AccountModel model = new AccountModel();
+
     protected override async Task OnInitializedAsync()
     {
-        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        if (!await AppAuthenticator.IsLoggedIn())
         {
             NavigationManager.NavigateTo("/account/login");
         }
@@ -37,10 +74,18 @@
 
     private async Task Logout()
     {
-        await AuthenticationClient.Logout();
-
-        await AppState.Logout(LocalStorageService);
+        await AppAuthenticator.Logout();
 
         NavigationManager.NavigateTo("/account/login");
+    }
+
+    private Task Delete()
+    {
+        throw new NotImplementedException();
+    }
+
+    private async Task ChangePassword()
+    {
+        await UserClient.UpdatePassword(model.ToUpdatePasswordRequest());
     }
 }

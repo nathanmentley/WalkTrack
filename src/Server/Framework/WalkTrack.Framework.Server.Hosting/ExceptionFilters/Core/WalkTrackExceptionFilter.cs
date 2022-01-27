@@ -67,9 +67,10 @@ internal sealed class WalkTrackExceptionFilter: ExceptionFilterAttribute
         if (handler is not null)
         {
             _Logger.LogDebug(
-                "Running {handler} for {exception}.",
+                "Running {handler} for {exceptionType}. {exception}",
                 handler.GetType(),
-                context.Exception.GetType()
+                context.Exception.GetType(),
+                context.Exception
             );
 
             context.Result = new ObjectResult(handler.BuildErrorResponse(context.Exception))

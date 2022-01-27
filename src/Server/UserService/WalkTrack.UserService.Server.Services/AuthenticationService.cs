@@ -207,6 +207,14 @@ internal sealed class AuthenticationService: IAuthenticationService
 
         user = await _repository.Update(user, cancellationToken);
 
+        await SendForgotPasswordEmail(user, request, cancellationToken);
+    }
+
+    private async Task SendForgotPasswordEmail(
+        User user,
+        ForgotPasswordRequest request,
+        CancellationToken cancellationToken
+    ) =>
         await _emailClient.Send(
             new [] {
                 new Email()
@@ -222,7 +230,6 @@ internal sealed class AuthenticationService: IAuthenticationService
             },
             cancellationToken
         );
-    }
 
     /// <summary>
     /// </summary>

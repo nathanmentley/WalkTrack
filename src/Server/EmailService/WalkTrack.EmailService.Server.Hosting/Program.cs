@@ -19,6 +19,8 @@ using WalkTrack.EmailService.Server.Configuration;
 using WalkTrack.EmailService.Server.Processor;
 using WalkTrack.EmailService.Server.Services;
 using WalkTrack.Framework.Server.Hosting;
+using WalkTrack.UserService.Client;
+using WalkTrack.UserService.Common;
 
 WebApplicationBuilder builder =
     WebApplication
@@ -30,10 +32,14 @@ builder
     .Services
         .AddOptions()
         .Configure<ConnectionSettings>(builder.Configuration.GetSection("ConnectionSettings"))
+        .Configure<ServiceAuthenticatorSettings>(builder.Configuration.GetSection("ServiceAuthenticatorSettings"))
         .WithFramework(builder.Configuration)
-        .WtihEmailTranscoders()
+        .WithEmailTranscoders()
         .WithEmailProcessor()
-        .WithEmailServices();
+        .WithEmailServices()
+
+        .WithUserTranscoders()
+        .WithServiceAuthentication(builder.Configuration);
 
 WebApplication app = builder.Build();
 

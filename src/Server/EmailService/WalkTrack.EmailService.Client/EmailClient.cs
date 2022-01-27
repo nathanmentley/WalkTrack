@@ -22,15 +22,19 @@ using WalkTrack.Framework.Common.Resources;
 
 namespace WalkTrack.EmailService.Client;
 
-internal sealed class EmailClient: BaseClient, IEmailClient
+internal sealed class EmailClient: BaseClient, IEmailClient, IDisposable
 {
+    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
-    public EmailClient(string url, ITranscoderProcessor transcoder)
+    public EmailClient(string url, IAuthenticator authenicator, ITranscoderProcessor transcoder)
     {
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
+
+        _authenicator = authenicator ??
+            throw new ArgumentNullException(nameof(authenicator));
 
         _httpClient = new HttpClient()
         {
@@ -50,8 +54,11 @@ internal sealed class EmailClient: BaseClient, IEmailClient
                     .AppendPathSegment("send")
             )
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<Email>(_httpClient, cancellationToken);
+
+    public void Dispose() =>
+        _httpClient.Dispose();
 }

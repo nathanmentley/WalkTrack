@@ -15,6 +15,7 @@
 */
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
 
 namespace WalkTrack.EntryService.Client;
@@ -26,9 +27,13 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WtihEntryClient(this IServiceCollection collection, string url) =>
+    public static IServiceCollection WithEntryClient(this IServiceCollection collection, string url) =>
         collection
             .AddSingleton<IEntryClient>(
-                sp => new EntryClient(url, sp.GetRequiredService<ITranscoderProcessor>())
+                sp => new EntryClient(
+                    url,
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
             );
 }

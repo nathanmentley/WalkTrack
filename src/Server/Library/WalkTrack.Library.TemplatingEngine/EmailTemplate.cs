@@ -13,27 +13,22 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
-using WalkTrack.Framework.Client.Authentications;
-using WalkTrack.Framework.Common.Resources;
 
-namespace WalkTrack.GoalService.Client;
+namespace WalkTrack.Library.TemplatingEngine;
 
-/// <summary>
-/// </summary>
-[ExcludeFromCodeCoverage]
-public static class ServiceCollectionExtensions
+///<summary>
+///</summary>
+public sealed record EmailTemplate
 {
-    /// <summary>
-    /// </summary>
-    public static IServiceCollection WithGoalClient(this IServiceCollection collection, string url) =>
-        collection
-            .AddSingleton<IGoalClient>(
-                sp => new GoalClient(
-                    url,
-                    sp.GetRequiredService<IAuthenticator>(),
-                    sp.GetRequiredService<ITranscoderProcessor>()
-                )
-            );
+    ///<summary>
+    ///</summary>
+    public string Key { get; init; } = string.Empty;
+
+    ///<summary>
+    ///</summary>
+    public string Html { get; init; } = string.Empty;
+
+    ///<summary>
+    ///</summary>
+    public string Text { get; init; } = string.Empty;
 }

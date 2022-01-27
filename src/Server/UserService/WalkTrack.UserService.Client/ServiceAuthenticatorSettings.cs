@@ -14,17 +14,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace WalkTrack.Framework.Client.Authentications;
+namespace WalkTrack.UserService.Client;
 
-/// <summary>
-/// </summary>
-public static class AuthenticationContext
+public sealed class ServiceAuthenticatorSettings
 {
     /// <summary>
     /// </summary>
-    public static string Token { get; set; } = string.Empty;
+    public string AuthAddress { get; set; } = string.Empty;
 
     /// <summary>
     /// </summary>
-    public static bool IsAuthenticated => !string.IsNullOrEmpty(Token);
+    public string Username { get; set; } = string.Empty;
+
+    /// <summary>
+    /// </summary>
+    public string Password { get; set; } = string.Empty;
 }

@@ -18,9 +18,11 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using WalkTrack.App;
+using WalkTrack.App.Authenticator;
 using WalkTrack.Common;
 using WalkTrack.EntryService.Client;
 using WalkTrack.EntryService.Common;
+using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.GoalService.Client;
 using WalkTrack.GoalService.Common;
 using WalkTrack.UserService.Client;
@@ -34,15 +36,19 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services
     .AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
     .WithWalkTrackClient()
-    .WtihEntryTranscoders()
-    .WtihEntryClient(builder.Configuration.GetValue<string>("EntryServiceUrl"))
-    .WtihGoalTranscoders()
-    .WtihGoalClient(builder.Configuration.GetValue<string>("GoalServiceUrl"))
-    .WtihUserTranscoders()
-    .WtihUserClient(
+    .WithEntryTranscoders()
+    .WithEntryClient(builder.Configuration.GetValue<string>("EntryServiceUrl"))
+    .WithGoalTranscoders()
+    .WithGoalClient(builder.Configuration.GetValue<string>("GoalServiceUrl"))
+    .WithUserTranscoders()
+    .WithUserClient(
         builder.Configuration.GetValue<string>("AuthServiceUrl"),
         builder.Configuration.GetValue<string>("UserServiceUrl")
     )
+
+    .AddSingleton<AppAuthenticator, CachedAppAuthenticator>()
+    .AddSingleton<IAuthenticator>(sp => sp.GetRequiredService<CachedAppAuthenticator>())
+
     .AddBlazoredLocalStorage();
 
 await builder.Build().RunAsync();

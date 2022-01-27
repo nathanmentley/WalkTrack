@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WtihEmailTranscoders(this IServiceCollection collection) =>
+    public static IServiceCollection WithEmailTranscoders(this IServiceCollection collection) =>
         collection
             .AddSingleton<ITranscoder, EmailJsonV1Transcoder>()
             .AddSingleton<ITranscoder, EmailCollectionJsonV1Transcoder>()

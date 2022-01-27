@@ -16,6 +16,7 @@
 
 using System.Net.Http.Headers;
 using Flurl;
+using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Client.Exceptions;
 using WalkTrack.Framework.Common.ApiErrorResponses;
 using WalkTrack.Framework.Common.Resources;
@@ -31,7 +32,7 @@ public class RequestBuilder
     private readonly IList<WalkTrackMediaType> _acceptTypes = new List<WalkTrackMediaType>();
     private readonly IList<IErrorHandler> _errorHandlers = new List<IErrorHandler>();
     private Url? _url = null;
-    private string? _authToken = null;
+    private IAuthenticator? _authenticator = null;
 
     public RequestBuilder(ITranscoderProcessor transcoder)
     {
@@ -74,9 +75,9 @@ public class RequestBuilder
         return this;
     }
 
-    public RequestBuilder WithAuthToken(string authToken)
+    public RequestBuilder WithAuthenticator(IAuthenticator authenticator)
     {
-        _authToken = authToken;
+        _authenticator = authenticator;
 
         return this;
     }
@@ -131,10 +132,7 @@ public class RequestBuilder
 
         using MemoryStream memoryStream = new MemoryStream();
 
-        if (
-            _body is TBody body &&
-            _contentType is not null
-        )
+        if (_body is TBody body && _contentType is not null)
         {
             await _transcoder.Encode(_contentType, body, memoryStream, cancellationToken);
 
@@ -144,9 +142,11 @@ public class RequestBuilder
             request.Content.Headers.ContentType = MedaiTypeToHeader(_contentType);
         }
 
-        if (!string.IsNullOrWhiteSpace(_authToken))
+        if (_authenticator is not null)
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authToken);
+            string authToken = await _authenticator.GetToken();
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
         }
 
         HttpResponseMessage response = await httpClient.SendAsync(request, cancellationToken);

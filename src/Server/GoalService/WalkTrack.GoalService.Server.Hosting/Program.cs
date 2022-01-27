@@ -19,6 +19,8 @@ using WalkTrack.GoalService.Server.DAL;
 using WalkTrack.GoalService.Server.Services;
 using WalkTrack.Framework.Server.Hosting;
 using WalkTrack.GoalService.Server.Configuration;
+using WalkTrack.UserService.Client;
+using WalkTrack.UserService.Common;
 
 WebApplicationBuilder builder =
     WebApplication
@@ -30,10 +32,14 @@ builder
     .Services
         .AddOptions()
         .Configure<DalSettings>(builder.Configuration.GetSection("DalSettings"))
+        .Configure<ServiceAuthenticatorSettings>(builder.Configuration.GetSection("ServiceAuthenticatorSettings"))
         .WithFramework(builder.Configuration)
-        .WtihGoalTranscoders()
+        .WithGoalTranscoders()
         .WithGoalDAL()
-        .WithGoalServices();
+        .WithGoalServices()
+
+        .WithUserTranscoders()
+        .WithServiceAuthentication(builder.Configuration);
 
 WebApplication app = builder.Build();
 

@@ -16,13 +16,12 @@
 
 using Flurl;
 using WalkTrack.Framework.Client;
-using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.UserService.Common;
 
 namespace WalkTrack.UserService.Client;
 
-internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
+internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, IDisposable
 {
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
@@ -38,9 +37,10 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
         };
     }
 
-    public async Task<AuthenticateResponse> Login(AuthenticateRequest request, CancellationToken cancellationToken = default)
-    {
-        AuthenticateResponse response =
+    public async Task<AuthenticateResponse> Login(
+        AuthenticateRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
             await new RequestBuilder(_transcoder)
                 .WithBody(request)
                 .WithContentTypes(MediaTypes.AuthenticateRequest)
@@ -55,14 +55,10 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
                 .WithErrorHandler(new ResourceNotFoundErrorHandler())
                 .Fetch<AuthenticateRequest, AuthenticateResponse>(_httpClient, cancellationToken);
 
-        AuthenticationContext.Token = response.Token;
-
-        return response;
-    }
-
-    public async Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default)
-    {
-        Token response =
+    public async Task<Token> RefreshToken(
+        Token request,
+        CancellationToken cancellationToken = default
+    ) =>
             await new RequestBuilder(_transcoder)
                 .WithBody(request)
                 .WithContentTypes(MediaTypes.Token)
@@ -77,11 +73,6 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
                 .WithErrorHandler(new ForbiddenErrorHandler())
                 .WithErrorHandler(new UnauthorizedErrorHandler())
                 .Fetch<Token, Token>(_httpClient, cancellationToken);
-
-        AuthenticationContext.Token = response.Id;
-
-        return response;
-    }
 
     public async Task RequestForgottenPassword(
         ForgotPasswordRequest request,
@@ -105,9 +96,7 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
     public async Task<AuthenticateResponse> ResetPassword(
         ResetPasswordRequest request,
         CancellationToken cancellationToken = default
-    )
-    {
-        AuthenticateResponse response =
+    ) =>
             await new RequestBuilder(_transcoder)
                 .WithBody(request)
                 .WithContentTypes(MediaTypes.ResetPasswordRequest)
@@ -124,22 +113,6 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient
                 .WithErrorHandler(new UnauthorizedErrorHandler())
                 .Fetch<ResetPasswordRequest, AuthenticateResponse>(_httpClient, cancellationToken);
 
-        AuthenticationContext.Token = response.Id;
-
-        return response;
-    }
-
-    public Task Login(Token token, CancellationToken cancellationToken = default)
-    {
-        AuthenticationContext.Token = token.Id;
-
-        return Task.CompletedTask;
-    }
-
-    public Task Logout(CancellationToken cancellationToken = default)
-    {
-        AuthenticationContext.Token = string.Empty;
-
-        return Task.CompletedTask;
-    }
+    public void Dispose() =>
+        _httpClient.Dispose();
 }

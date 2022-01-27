@@ -22,8 +22,9 @@ using WalkTrack.GoalService.Common;
 
 namespace WalkTrack.GoalService.Client;
 
-internal sealed class GoalClient: BaseClient, IGoalClient
+internal sealed class GoalClient: BaseClient, IGoalClient, IDisposable
 {
+    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
@@ -43,10 +44,13 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             .WithVersion(1)
             .Build();
 
-    public GoalClient(string url, ITranscoderProcessor transcoder)
+    public GoalClient(string url, IAuthenticator authenicator, ITranscoderProcessor transcoder)
     {
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
+
+        _authenicator = authenicator ??
+            throw new ArgumentNullException(nameof(authenicator));
 
         _httpClient = new HttpClient()
         {
@@ -65,7 +69,7 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             )
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
@@ -81,7 +85,7 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             )
             .WithAcceptType(_goalsMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<IEnumerable<Goal>>(_httpClient, cancellationToken);
@@ -98,7 +102,7 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             )
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Goal, Goal>(_httpClient, cancellationToken);
@@ -114,7 +118,7 @@ internal sealed class GoalClient: BaseClient, IGoalClient
                     .AppendPathSegment("goal")
             )
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
@@ -131,9 +135,12 @@ internal sealed class GoalClient: BaseClient, IGoalClient
             )
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
+
+    public void Dispose() =>
+        _httpClient.Dispose();
 }

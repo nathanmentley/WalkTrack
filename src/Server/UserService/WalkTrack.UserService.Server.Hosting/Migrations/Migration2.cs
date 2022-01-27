@@ -25,8 +25,14 @@ public class Migration2: Migration
     {
         Alter
             .Table("Users")
-            .AddColumn("ResetToken").AsString(255).NotNullable()
-            .AddColumn("ResetTokenExpiresAt").AsDateTime().NotNullable();
+            .AddColumn("ResetToken")
+                .AsString(255)
+                .WithDefaultValue(string.Empty)
+                .NotNullable()
+            .AddColumn("ResetTokenExpiresAt")
+                .AsDateTime2()
+                .WithDefaultValue(DateTime.MinValue)
+                .NotNullable();
     }
 
     public override void Down()

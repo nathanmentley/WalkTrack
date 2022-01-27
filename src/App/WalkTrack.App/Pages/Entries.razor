@@ -18,9 +18,8 @@
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@inject IAuthenticationClient AuthenticationClient
 @inject IEntryClient EntryClient
-@inject ILocalStorageService LocalStorageService
+@inject AppAuthenticator AppAuthenticator
 
 <PageTitle>Entries</PageTitle>
 
@@ -99,7 +98,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        if (!await AppAuthenticator.IsLoggedIn())
         {
             NavigationManager.NavigateTo("/account/login");
         }

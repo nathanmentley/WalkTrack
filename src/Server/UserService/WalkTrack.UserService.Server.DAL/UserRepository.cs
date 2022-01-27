@@ -53,7 +53,7 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
             Password = resource.Password,
             Salt = resource.Salt,
             ResetToken = resource.ResetToken,
-            ResetTokenExpiresAtUtc = resource.ResetTokenExpiresAt
+            ResetTokenExpiresAt = resource.ResetTokenExpiresAt
         };
 
     protected override User FromRecord(UserPresistedResource record) =>
@@ -66,6 +66,6 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
             Password = record.Password,
             Salt = record.Salt,
             ResetToken = record.ResetToken,
-            ResetTokenExpiresAt = record.ResetTokenExpiresAtUtc
+            ResetTokenExpiresAt = record.ResetTokenExpiresAt
         };
 }

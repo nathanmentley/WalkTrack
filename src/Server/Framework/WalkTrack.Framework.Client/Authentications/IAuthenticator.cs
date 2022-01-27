@@ -14,28 +14,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.Framework.Client.Authentications;
-using WalkTrack.UserService.Common;
+namespace WalkTrack.Framework.Client.Authentications;
 
-namespace WalkTrack.UserService.Server;
-
-/// <summary>
-/// </summary>
-public interface IAuthenticationService
+public interface IAuthenticator
 {
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<Token> RefreshToken(Token token, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// </summary>
-    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+    Task<string> GetToken(CancellationToken cancellationToken = default);
 }

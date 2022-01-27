@@ -15,6 +15,7 @@
 */
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
 
 namespace WalkTrack.EmailService.Client;
@@ -26,9 +27,13 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WtihEmailClient(this IServiceCollection collection, string url) =>
+    public static IServiceCollection WithEmailClient(this IServiceCollection collection, string url) =>
         collection
             .AddSingleton<IEmailClient>(
-                sp => new EmailClient(url, sp.GetRequiredService<ITranscoderProcessor>())
+                sp => new EmailClient(
+                    url,
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
             );
 }

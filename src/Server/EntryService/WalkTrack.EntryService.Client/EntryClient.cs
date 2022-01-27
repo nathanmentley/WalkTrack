@@ -22,15 +22,19 @@ using WalkTrack.Framework.Common.Resources;
 
 namespace WalkTrack.EntryService.Client;
 
-internal sealed class EntryClient: BaseClient, IEntryClient
+internal sealed class EntryClient: BaseClient, IEntryClient, IDisposable
 {
+    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
-    public EntryClient(string url, ITranscoderProcessor transcoder)
+    public EntryClient(string url, IAuthenticator authenicator, ITranscoderProcessor transcoder)
     {
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
+
+        _authenicator = authenicator ??
+            throw new ArgumentNullException(nameof(authenicator));
 
         _httpClient = new HttpClient()
         {
@@ -49,7 +53,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             )
             .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
@@ -65,7 +69,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             )
             .WithAcceptType(MediaTypes.Entries)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<IEnumerable<Entry>>(_httpClient, cancellationToken);
@@ -82,7 +86,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             )
             .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Entry, Entry>(_httpClient, cancellationToken);
@@ -98,7 +102,7 @@ internal sealed class EntryClient: BaseClient, IEntryClient
                     .AppendPathSegment("entry")
             )
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
@@ -115,9 +119,12 @@ internal sealed class EntryClient: BaseClient, IEntryClient
             )
             .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthToken(AuthenticationContext.Token)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ResourceNotFoundErrorHandler())
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
+
+    public void Dispose() =>
+        _httpClient.Dispose();
 }

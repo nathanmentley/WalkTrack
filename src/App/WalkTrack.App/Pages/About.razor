@@ -17,8 +17,7 @@
 @page "/about"
 
 @inject NavigationManager NavigationManager
-@inject IAuthenticationClient AuthenticationClient
-@inject ILocalStorageService LocalStorageService
+@inject AppAuthenticator AppAuthenticator
 
 <PageTitle>About</PageTitle>
 
@@ -31,7 +30,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        if (!(await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService)))
+        if (!await AppAuthenticator.IsLoggedIn())
         {
             NavigationManager.NavigateTo("/account/login");
         }

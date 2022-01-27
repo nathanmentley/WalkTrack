@@ -18,9 +18,8 @@
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
-@inject IAuthenticationClient AuthenticationClient
 @inject IUserClient UserClient
-@inject ILocalStorageService LocalStorageService
+@inject AppAuthenticator AppAuthenticator
 
 <div class="card">
     <h4 class="card-header">Register</h4>
@@ -71,7 +70,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (await AppState.IsLoggedIn(AuthenticationClient, LocalStorageService))
+        if (await AppAuthenticator.IsLoggedIn())
         {
             NavigationManager.NavigateTo("");
         }
@@ -84,9 +83,7 @@
             model.Loading = true;
 
             await UserClient.Create(model.ToCreateRequest());
-            AuthenticateResponse response = await AuthenticationClient.Login(model.ToLoginRequest());
-
-            await AppState.PersistToken(LocalStorageService, response.Token, response.Id);
+            await AppAuthenticator.Login(model.ToLoginRequest());
 
             model.Loading = false;
 

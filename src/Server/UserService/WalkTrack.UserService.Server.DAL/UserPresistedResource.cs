@@ -14,12 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using System.Data.SqlTypes;
 using WalkTrack.Framework.Server.DAL.Mssql;
 
 namespace WalkTrack.UserService.Server.DAL;
 
 internal sealed class UserPresistedResource: BasePresistedResource
 {
+    private readonly static DateTime MinSqlDataTime =
+        SqlDateTime.MinValue.Value;
+
     internal Guid Id { get; init; } = Guid.Empty;
     internal string Username { get; init; } = string.Empty;
     internal string Email { get; init; } = string.Empty;
@@ -27,5 +31,14 @@ internal sealed class UserPresistedResource: BasePresistedResource
     internal string Password { get; init; } = string.Empty;
     internal string Salt { get; init; } = string.Empty;
     internal string ResetToken { get; init; } = string.Empty;
-    internal DateTime ResetTokenExpiresAtUtc { get; init; } = DateTime.MinValue;
+    private DateTime _resetTokenExpiresAt = MinSqlDataTime;
+    internal DateTime ResetTokenExpiresAt {
+        get => _resetTokenExpiresAt;
+        init {
+            _resetTokenExpiresAt =
+                value < MinSqlDataTime ?
+                    MinSqlDataTime:
+                    value;
+        }
+    }
 }

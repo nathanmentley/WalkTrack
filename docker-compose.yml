@@ -130,6 +130,7 @@ services:
     - DalSettings__ConnectionString=${MSSQL_CONNECTION_STRING}
     - AdminSettings__AdminUsername=${ADMIN_USERNAME}
     - AdminSettings__AdminPassword=${ADMIN_PASSWORD}
+    - EmailServiceSettings__Url=http://emailservice:8003/
     expose:
     - 8000
     depends_on:

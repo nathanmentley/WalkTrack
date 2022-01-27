@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WtihGoalTranscoders(this IServiceCollection collection) =>
+    public static IServiceCollection WithGoalTranscoders(this IServiceCollection collection) =>
         collection
             .AddSingleton<ITranscoder, GoalJsonV1Transcoder>()
             .AddSingleton<ITranscoder, GoalCollectionJsonV1Transcoder>()

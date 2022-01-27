@@ -13,6 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\WalkTrack.Framework.Server.Hosting\WalkTrack.Framework.Server.Hosting.csproj" />
 
+    <ProjectReference Include="..\..\UserService\WalkTrack.UserService.Client\WalkTrack.UserService.Client.csproj" />
+
     <ProjectReference Include="..\WalkTrack.EmailService.Server.Services\WalkTrack.EmailService.Server.Services.csproj" />
     <ProjectReference Include="..\WalkTrack.EmailService.Server.Processor\WalkTrack.EmailService.Server.Processor.csproj" />
     <ProjectReference Include="..\WalkTrack.EmailService.Server\WalkTrack.EmailService.Server.csproj" />

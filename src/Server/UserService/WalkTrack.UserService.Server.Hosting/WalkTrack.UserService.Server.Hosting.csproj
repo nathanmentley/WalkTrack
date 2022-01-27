@@ -18,6 +18,7 @@
     <ProjectReference Include="..\WalkTrack.UserService.Server.Services\WalkTrack.UserService.Server.Services.csproj" />
     <ProjectReference Include="..\WalkTrack.UserService.Server.DAL\WalkTrack.UserService.Server.DAL.csproj" />
     <ProjectReference Include="..\WalkTrack.UserService.Server\WalkTrack.UserService.Server.csproj" />
+    <ProjectReference Include="..\WalkTrack.UserService.Client\WalkTrack.UserService.Client.csproj" />
   </ItemGroup>
 
 </Project>
