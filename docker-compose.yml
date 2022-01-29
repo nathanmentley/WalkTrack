@@ -34,6 +34,23 @@ services:
       - ./data/backups/mssql:/backup
     restart: unless-stopped
 
+  authservice:
+    container_name: authservice
+    build:
+      context: .
+      dockerfile: src/Server/AuthService/dockerfile
+      args:
+        WalktrackEnvironment: ${WALKTRACK_ENVIRONMENT}
+    environment:
+    - AuthenticationSettings__JwtSecret=${JWT_SECRET}
+    - DalSettings__ConnectionString=${MSSQL_AUTH_CONNECTION_STRING}
+    - AdminSettings__AdminUsername=${ADMIN_USERNAME}
+    - AdminSettings__AdminPassword=${ADMIN_PASSWORD}
+    - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
+    expose:
+    - 8000
+    restart: unless-stopped
+
   emailservice:
     container_name: emailservice
     build:
@@ -44,9 +61,11 @@ services:
     environment:
     - AuthenticationSettings__JwtSecret=${JWT_SECRET}
     - ConnectionSettings__ApiKey=${SENDGRID_API_KEY}
-    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
+    - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8003
+    depends_on:
+    - authservice
     restart: unless-stopped
 
   entryservice:
@@ -61,11 +80,12 @@ services:
     - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
     - DalSettings__Username=${COUCHDB_USER}
     - DalSettings__Password=${COUCHDB_PASSWORD}
-    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
+    - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8001
     depends_on:
     - couchdb
+    - authservice
     restart: unless-stopped
 
   goalservice:
@@ -80,11 +100,12 @@ services:
     - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
     - DalSettings__Username=${COUCHDB_USER}
     - DalSettings__Password=${COUCHDB_PASSWORD}
-    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
+    - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8002
     depends_on:
     - couchdb
+    - authservice
     restart: unless-stopped
 
   userservice:
@@ -96,15 +117,14 @@ services:
         WalktrackEnvironment: ${WALKTRACK_ENVIRONMENT}
     environment:
     - AuthenticationSettings__JwtSecret=${JWT_SECRET}
-    - DalSettings__ConnectionString=${MSSQL_CONNECTION_STRING}
-    - AdminSettings__AdminUsername=${ADMIN_USERNAME}
-    - AdminSettings__AdminPassword=${ADMIN_PASSWORD}
+    - DalSettings__ConnectionString=${MSSQL_USER_CONNECTION_STRING}
     - EmailServiceSettings__Url=http://emailservice:8003/
-    - ServiceAuthenticatorSettings__AuthAddress=http://userservice:8000/
+    - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
-    - 8000
+    - 8004
     depends_on:
     - mssql
+    - authservice
     - emailservice
     restart: unless-stopped
 
@@ -118,6 +138,7 @@ services:
     expose:
     - 80
     depends_on:
+    - authservice
     - entryservice
     - goalservice
     - userservice
@@ -137,6 +158,7 @@ services:
     - "80:80"
     - "443:443"
     depends_on:
+    - authservice
     - entryservice
     - goalservice
     - userservice

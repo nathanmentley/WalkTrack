@@ -108,14 +108,14 @@ internal sealed class EntryClient: BaseClient, IEntryClient, IDisposable
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<Entry>(_httpClient, cancellationToken);
 
-    public async Task Delete(Entry entry, CancellationToken cancellationToken = default) =>
+    public async Task Delete(string id, CancellationToken cancellationToken = default) =>
         await new RequestBuilder(_transcoder)
             .WithMethod(HttpMethod.Delete)
             .WithUrl(
                 new Url()
                     .AppendPathSegment("v1")
                     .AppendPathSegment("entry")
-                    .AppendPathSegment(entry.Id)
+                    .AppendPathSegment(id)
             )
             .WithAcceptType(MediaTypes.Entry)
             .WithAcceptType(MediaTypes.ApiError)

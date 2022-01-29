@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Framework\WalkTrack.Framework.Server\WalkTrack.Framework.Server.csproj" />
+    <ProjectReference Include="..\..\..\Framework\WalkTrack.Framework.Server\WalkTrack.Framework.Server.csproj" />
 
     <ProjectReference Include="..\WalkTrack.EntryService.Common\WalkTrack.EntryService.Common.csproj" />
   </ItemGroup>

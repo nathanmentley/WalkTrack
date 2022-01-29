@@ -45,13 +45,6 @@ public interface IUserService
         CancellationToken cancellationToken = default
     );
 
-    Task<User> UpdatePassword(
-        AuthenticationContext authenticationContext,
-        string userId,
-        string password,
-        CancellationToken cancellationToken = default
-    );
-
     Task Delete(
         AuthenticationContext authenticationContext,
         string id,

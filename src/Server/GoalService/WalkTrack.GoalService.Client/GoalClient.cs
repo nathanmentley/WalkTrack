@@ -124,14 +124,14 @@ internal sealed class GoalClient: BaseClient, IGoalClient, IDisposable
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<Goal>(_httpClient, cancellationToken);
 
-    public async Task Delete(Goal goal, CancellationToken cancellationToken = default) =>
+    public async Task Delete(string id, CancellationToken cancellationToken = default) =>
         await new RequestBuilder(_transcoder)
             .WithMethod(HttpMethod.Delete)
             .WithUrl(
                 new Url()
                     .AppendPathSegment("v1")
                     .AppendPathSegment("goal")
-                    .AppendPathSegment(goal.Id)
+                    .AppendPathSegment(id)
             )
             .WithAcceptType(_goalMediaType)
             .WithAcceptType(MediaTypes.ApiError)

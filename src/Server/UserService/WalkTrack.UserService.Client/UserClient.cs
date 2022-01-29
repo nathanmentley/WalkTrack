@@ -52,14 +52,6 @@ internal sealed class UserClient: BaseClient, IUserClient, IDisposable
             .WithVersion(1)
             .Build();
 
-    private static readonly WalkTrackMediaType _updatePasswordMediaType =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.UpdatePasswordRequest")
-            .WithVersion(1)
-            .Build();
-
     public UserClient(string url, IAuthenticator authenicator, ITranscoderProcessor transcoder)
     {
         _transcoder = transcoder ??
@@ -140,31 +132,14 @@ internal sealed class UserClient: BaseClient, IUserClient, IDisposable
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<User>(_httpClient, cancellationToken);
 
-    public async Task UpdatePassword(UpdatePasswordRequest request, CancellationToken cancellationToken = default) =>
-        await new RequestBuilder(_transcoder)
-            .WithBody(request)
-            .WithContentTypes(_updatePasswordMediaType)
-            .WithMethod(HttpMethod.Put)
-            .WithUrl(
-                new Url()
-                    .AppendPathSegment("v1")
-                    .AppendPathSegment("user")
-            )
-            .WithAcceptType(MediaTypes.ApiError)
-            .WithAuthenticator(_authenicator)
-            .WithErrorHandler(new ResourceNotFoundErrorHandler())
-            .WithErrorHandler(new ForbiddenErrorHandler())
-            .WithErrorHandler(new UnauthorizedErrorHandler())
-            .Send<UpdatePasswordRequest>(_httpClient, cancellationToken);
-
-    public async Task Delete(User user, CancellationToken cancellationToken = default) =>
+    public async Task Delete(string id, CancellationToken cancellationToken = default) =>
         await new RequestBuilder(_transcoder)
             .WithMethod(HttpMethod.Delete)
             .WithUrl(
                 new Url()
                     .AppendPathSegment("v1")
                     .AppendPathSegment("user")
-                    .AppendPathSegment(user.Id)
+                    .AppendPathSegment(id)
             )
             .WithAcceptType(_userMediaType)
             .WithAcceptType(MediaTypes.ApiError)

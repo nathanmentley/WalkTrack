@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Framework\WalkTrack.Framework.Server.Hosting\WalkTrack.Framework.Server.Hosting.csproj" />
+    <ProjectReference Include="..\..\..\Framework\WalkTrack.Framework.Server.Hosting\WalkTrack.Framework.Server.Hosting.csproj" />
 
-    <ProjectReference Include="..\..\UserService\WalkTrack.UserService.Client\WalkTrack.UserService.Client.csproj" />
+    <ProjectReference Include="..\..\AuthService\WalkTrack.AuthService.Client\WalkTrack.AuthService.Client.csproj" />
 
     <ProjectReference Include="..\WalkTrack.EntryService.Server.Services\WalkTrack.EntryService.Server.Services.csproj" />
     <ProjectReference Include="..\WalkTrack.EntryService.Server.DAL\WalkTrack.EntryService.Server.DAL.csproj" />

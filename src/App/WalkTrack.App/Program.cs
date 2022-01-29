@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using WalkTrack.App;
 using WalkTrack.App.Authenticator;
+using WalkTrack.AuthService.Client;
+using WalkTrack.AuthService.Common;
 using WalkTrack.Common;
 using WalkTrack.EntryService.Client;
 using WalkTrack.EntryService.Common;
@@ -36,15 +38,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services
     .AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
     .WithWalkTrackClient()
+    .WithAuthTranscoders()
+    .WithAuthClient(builder.Configuration.GetValue<string>("AuthServiceUrl"))
     .WithEntryTranscoders()
     .WithEntryClient(builder.Configuration.GetValue<string>("EntryServiceUrl"))
     .WithGoalTranscoders()
     .WithGoalClient(builder.Configuration.GetValue<string>("GoalServiceUrl"))
     .WithUserTranscoders()
-    .WithUserClient(
-        builder.Configuration.GetValue<string>("AuthServiceUrl"),
-        builder.Configuration.GetValue<string>("UserServiceUrl")
-    )
+    .WithUserClient(builder.Configuration.GetValue<string>("UserServiceUrl"))
 
     .AddSingleton<AppAuthenticator, AppAuthenticator>()
     .AddSingleton<IAuthenticator>(sp => sp.GetRequiredService<AppAuthenticator>())

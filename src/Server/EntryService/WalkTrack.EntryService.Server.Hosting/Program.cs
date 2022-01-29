@@ -14,13 +14,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using WalkTrack.AuthService.Client;
+using WalkTrack.AuthService.Common;
 using WalkTrack.EntryService.Common;
 using WalkTrack.EntryService.Server.Configuration;
 using WalkTrack.EntryService.Server.DAL;
 using WalkTrack.EntryService.Server.Services;
 using WalkTrack.Framework.Server.Hosting;
-using WalkTrack.UserService.Client;
-using WalkTrack.UserService.Common;
 
 WebApplicationBuilder builder =
     WebApplication
@@ -38,7 +38,7 @@ builder
         .WithEntryDAL()
         .WithEntryServices()
 
-        .WithUserTranscoders()
+        .WithAuthTranscoders()
         .WithServiceAuthentication(builder.Configuration);
 
 WebApplication app = builder.Build();

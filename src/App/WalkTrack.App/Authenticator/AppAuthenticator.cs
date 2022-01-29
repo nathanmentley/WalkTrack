@@ -16,8 +16,8 @@
 
 using Blazored.LocalStorage;
 using WalkTrack.Framework.Client.Authentications;
-using WalkTrack.UserService.Client;
-using WalkTrack.UserService.Common;
+using WalkTrack.AuthService.Client;
+using WalkTrack.AuthService.Common;
 
 namespace WalkTrack.App.Authenticator;
 

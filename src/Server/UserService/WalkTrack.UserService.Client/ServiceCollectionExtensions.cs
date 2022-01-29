@@ -14,7 +14,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
@@ -28,11 +27,8 @@ public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// </summary>
-    public static IServiceCollection WithUserClient(this IServiceCollection collection, string authUrl, string userUrl) =>
+    public static IServiceCollection WithUserClient(this IServiceCollection collection, string userUrl) =>
         collection
-            .AddSingleton<IAuthenticationClient>(
-                sp => new AuthenticationClient(authUrl, sp.GetRequiredService<ITranscoderProcessor>())
-            )
             .AddSingleton<IUserClient>(
                 sp => new UserClient(
                     userUrl,
@@ -40,21 +36,4 @@ public static class ServiceCollectionExtensions
                     sp.GetRequiredService<ITranscoderProcessor>()
                 )
             );
-
-    /// <summary>
-    /// </summary>
-    public static IServiceCollection WithServiceAuthentication(
-        this IServiceCollection collection,
-        IConfiguration configuration
-    ) =>
-        collection
-            .AddSingleton<IAuthenticationClient>(
-                sp => new AuthenticationClient(
-                    configuration
-                        .GetSection("ServiceAuthenticatorSettings")
-                        .GetValue<string>("AuthAddress"),
-                    sp.GetRequiredService<ITranscoderProcessor>()
-                )
-            )
-            .AddSingleton<IAuthenticator, ServiceAuthenticator>();
 }

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Framework\WalkTrack.Framework.Server\WalkTrack.Framework.Server.csproj" />
+
+    <ProjectReference Include="..\WalkTrack.AuthService.Common\WalkTrack.AuthService.Common.csproj" />
+  </ItemGroup>
+
+</Project>

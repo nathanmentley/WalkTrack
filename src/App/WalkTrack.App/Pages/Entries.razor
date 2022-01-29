@@ -115,7 +115,7 @@
         {
             try
             {
-                await EntryClient.Delete(entry);
+                await EntryClient.Delete(entry.Id);
             }
             catch(UnauthorizedClientException)
             {

@@ -28,14 +28,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection WithUserTranscoders(this IServiceCollection collection) =>
         collection
-            .AddSingleton<ITranscoder, AuthenticateRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, AuthenticateResponseJsonV1Transcoder>()
             .AddSingleton<ITranscoder, CreateUserRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, ForgotPasswordRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, ResetPasswordRequestJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, TokenJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, UpdatePasswordRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, UserJsonV1Transcoder>()
-            .AddSingleton<ITranscoder, UserCollectionJsonV1Transcoder>()
-        ;
+            .AddSingleton<ITranscoder, UserCollectionJsonV1Transcoder>();
 }

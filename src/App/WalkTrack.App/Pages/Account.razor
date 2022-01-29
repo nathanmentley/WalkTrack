@@ -19,7 +19,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorageService
-@inject IUserClient UserClient
+@inject IAuthenticationClient AuthenticationClient
 @inject AppAuthenticator AppAuthenticator
 
 <PageTitle>Account</PageTitle>
@@ -85,8 +85,9 @@
         throw new NotImplementedException();
     }
 
-    private async Task ChangePassword()
+    private Task ChangePassword()
     {
-        await UserClient.UpdatePassword(model.ToUpdatePasswordRequest());
+        throw new NotImplementedException();
+        //await AuthenticationClient.UpdatePassword(model.ToUpdatePasswordRequest());
     }
 }

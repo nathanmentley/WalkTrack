@@ -14,7 +14,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.UserService.Common;
+using WalkTrack.AuthService.Common;
 
 namespace WalkTrack.App.Pages.Models;
 

@@ -24,5 +24,5 @@ public interface IEntryClient
     Task<IEnumerable<Entry>> Search(CancellationToken cancellationToken = default);
     Task<Entry> Create(Entry entry, CancellationToken cancellationToken = default);
     Task Update(Entry entry, CancellationToken cancellationToken = default);
-    Task Delete(Entry entry, CancellationToken cancellationToken = default);
+    Task Delete(string id, CancellationToken cancellationToken = default);
 }

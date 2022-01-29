@@ -22,8 +22,6 @@ namespace WalkTrack.GoalService.Server.DAL;
 
 internal class IdCriterionHandler : AbstractCriterionHandler<IdCriterion, GoalPersistedDocuemnt>
 {
-    protected override Expression<Func<GoalPersistedDocuemnt, bool>> Handle(IdCriterion criterion)
-    {
-        return record => record.Id == criterion.Id;
-    }
+    protected override Expression<Func<GoalPersistedDocuemnt, bool>> Handle(IdCriterion criterion) =>
+        record => record.Id == criterion.Id;
 }

@@ -28,5 +28,5 @@ public interface IGoalClient
 
     Task Update(Goal goal, CancellationToken cancellationToken = default);
 
-    Task Delete(Goal goal, CancellationToken cancellationToken = default);
+    Task Delete(string id, CancellationToken cancellationToken = default);
 }

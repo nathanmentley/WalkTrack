@@ -25,15 +25,11 @@ namespace WalkTrack.UserService.Server.Services;
 internal sealed class UserService: IUserService
 {
     private readonly IUserRepository _repository;
-    private readonly IHashingUtility _hashingUtility;
 
-    public UserService(IUserRepository repository, IHashingUtility hashingUtility)
+    public UserService(IUserRepository repository)
     {
         _repository = repository ??
             throw new ArgumentNullException(nameof(repository));
-
-        _hashingUtility = hashingUtility ??
-            throw new ArgumentNullException(nameof(hashingUtility));
     }
  
     public Task<User> Fetch(
@@ -98,7 +94,7 @@ internal sealed class UserService: IUserService
             resource with {
                 Id = Guid.NewGuid().ToString(),
                 Salt = salt,
-                Password = _hashingUtility.Hash(resource.Password, salt)
+                Password = ""//_hashingUtility.Hash(resource.Password, salt)
             },
             cancellationToken
         );
@@ -119,22 +115,6 @@ internal sealed class UserService: IUserService
         };
 
         return await _repository.Update(userWithUpdates, cancellationToken);
-    }
-
-    public async Task<User> UpdatePassword(
-        AuthenticationContext authenticationContext,
-        string userId,
-        string password,
-        CancellationToken cancellationToken = default
-    )
-    {
-        User user = await FetchRecordWithAuth(authenticationContext, userId, cancellationToken);
-
-        user = user with {
-            Password = _hashingUtility.Hash(password, user.Salt)
-        };
-
-        return await _repository.Update(user, cancellationToken);
     }
 
     public async Task Delete(

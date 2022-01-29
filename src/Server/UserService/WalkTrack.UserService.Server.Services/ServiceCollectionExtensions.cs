@@ -29,10 +29,5 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection WithUserServices(this IServiceCollection collection, IConfiguration configuration) =>
         collection
-            .AddSingleton<IAuthenticationService, AuthenticationService>()
-            .AddSingleton<IHashingUtility, HashingUtility>()
-            .AddSingleton<IUserService, UserService>()
-
-            .Configure<AdminSettings>(configuration.GetSection("AdminSettings"))
-        ;
+            .AddSingleton<IUserService, UserService>();
 }

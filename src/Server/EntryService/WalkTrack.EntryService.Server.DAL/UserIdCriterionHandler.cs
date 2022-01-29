@@ -22,8 +22,6 @@ namespace WalkTrack.EntryService.Server.DAL;
 
 internal class UserIdCriterionHandler : AbstractCriterionHandler<UserIdCriterion, EntryPersistedDocuemnt>
 {
-    protected override Expression<Func<EntryPersistedDocuemnt, bool>> Handle(UserIdCriterion criterion)
-    {
-        return record => record.UserId == criterion.UserId;
-    }
+    protected override Expression<Func<EntryPersistedDocuemnt, bool>> Handle(UserIdCriterion criterion) =>
+        record => record.UserId == criterion.UserId;
 }

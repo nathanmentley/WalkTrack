@@ -14,13 +14,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using WalkTrack.AuthService.Client;
+using WalkTrack.AuthService.Common;
 using WalkTrack.EmailService.Common;
 using WalkTrack.EmailService.Server.Configuration;
 using WalkTrack.EmailService.Server.Processor;
 using WalkTrack.EmailService.Server.Services;
 using WalkTrack.Framework.Server.Hosting;
-using WalkTrack.UserService.Client;
-using WalkTrack.UserService.Common;
 
 WebApplicationBuilder builder =
     WebApplication
@@ -38,7 +38,7 @@ builder
         .WithEmailProcessor()
         .WithEmailServices()
 
-        .WithUserTranscoders()
+        .WithAuthTranscoders()
         .WithServiceAuthentication(builder.Configuration);
 
 WebApplication app = builder.Build();

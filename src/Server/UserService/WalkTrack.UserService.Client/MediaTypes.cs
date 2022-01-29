@@ -27,44 +27,4 @@ internal static class MediaTypes
             .WithStructure("WalkTrack.ApiError")
             .WithVersion(1)
             .Build();
-
-    public static readonly WalkTrackMediaType AuthenticateRequest =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.AuthenticateRequest")
-            .WithVersion(1)
-            .Build();
-
-    public static readonly WalkTrackMediaType AuthenticateResponse =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.AuthenticateResponse")
-            .WithVersion(1)
-            .Build();
-
-    public static readonly WalkTrackMediaType Token =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.Token")
-            .WithVersion(1)
-            .Build();
-
-    public static readonly WalkTrackMediaType ForgotPasswordRequest =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.ForgotPasswordRequest")
-            .WithVersion(1)
-            .Build();
-
-    public static readonly WalkTrackMediaType ResetPasswordRequest =
-        new WalkTrackMediaTypeBuilder()
-            .WithType(WalkTrackMediaTypeTypes.Application)
-            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.ResetPasswordRequest")
-            .WithVersion(1)
-            .Build();
 }

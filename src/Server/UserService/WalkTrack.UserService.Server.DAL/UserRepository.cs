@@ -28,7 +28,6 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
         new ICriterionHandler[] {
             new EmailCriterionHandler(),
             new IdCriterionHandler(),
-            new ResetTokenCriterionHandler(),
             new UsernameCriterionHandler()
         };
 
