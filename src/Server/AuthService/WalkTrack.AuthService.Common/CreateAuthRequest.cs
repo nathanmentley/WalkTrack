@@ -14,21 +14,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.Framework.Common.Criteria;
+using System.Diagnostics.CodeAnalysis;
 
-namespace WalkTrack.AuthService.Common.Criteria;
+namespace WalkTrack.AuthService.Common;
 
-public sealed class EmailCriterion: ICriterion
+/// <summary>
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed record CreateAuthRequest
 {
-    public string Email { get; }
+    /// <summary>
+    /// </summary>
+    public string Username { get; init; } = string.Empty;
 
-    public EmailCriterion(string email)
-    {
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            throw new ArgumentNullException(nameof(email));
-        }
-
-        Email = email;
-    }
+    /// <summary>
+    /// </summary>
+    public string Password { get; init; } = string.Empty;
 }

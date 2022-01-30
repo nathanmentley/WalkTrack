@@ -27,6 +27,6 @@ public sealed class ForgotPasswordModel
     public ForgotPasswordRequest ToForgotPasswordRequest() =>
         new ForgotPasswordRequest()
         {
-            Email = Email
+            Username = Email
         };
 }

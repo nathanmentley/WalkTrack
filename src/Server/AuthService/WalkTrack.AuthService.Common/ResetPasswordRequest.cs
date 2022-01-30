@@ -25,7 +25,7 @@ public sealed record ResetPasswordRequest
 {
     /// <summary>
     /// </summary>
-    public string Email { get; init; } = string.Empty;
+    public string Username { get; init; } = string.Empty;
 
     /// <summary>
     /// </summary>

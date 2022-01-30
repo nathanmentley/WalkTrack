@@ -14,6 +14,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+using WalkTrack.AuthService.Client;
+using WalkTrack.AuthService.Common;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server.Authentications;
 using WalkTrack.Framework.Server.Exceptions;
@@ -24,10 +26,17 @@ namespace WalkTrack.UserService.Server.Services;
 
 internal sealed class UserService: IUserService
 {
+    private readonly IAuthenticationClient _authenticationClient;
     private readonly IUserRepository _repository;
 
-    public UserService(IUserRepository repository)
+    public UserService(
+        IAuthenticationClient authenticationClient,
+        IUserRepository repository
+    )
     {
+        _authenticationClient = authenticationClient ??
+            throw new ArgumentNullException(nameof(authenticationClient));
+
         _repository = repository ??
             throw new ArgumentNullException(nameof(repository));
     }
@@ -66,8 +75,7 @@ internal sealed class UserService: IUserService
                     },
                     cancellationToken
                 )
-            )
-                .Any()
+            ).Any()
         )
         {
             throw new InvalidRequestException("Email already exists");
@@ -81,20 +89,24 @@ internal sealed class UserService: IUserService
                     },
                     cancellationToken
                 )
-            )
-                .Any()
+            ).Any()
         )
         {
             throw new InvalidRequestException("Email already exists");
         }
 
-        string salt = Guid.NewGuid().ToString();
+        await _authenticationClient.Create(
+            new CreateAuthRequest()
+            {
+                Username = resource.Username,
+                Password = resource.Password
+            },
+            cancellationToken
+        );
 
         return await _repository.Create(
             resource with {
-                Id = Guid.NewGuid().ToString(),
-                Salt = salt,
-                Password = ""//_hashingUtility.Hash(resource.Password, salt)
+                Id = Guid.NewGuid().ToString()
             },
             cancellationToken
         );

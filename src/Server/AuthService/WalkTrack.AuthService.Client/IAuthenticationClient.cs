@@ -20,6 +20,8 @@ namespace WalkTrack.AuthService.Client;
 
 public interface IAuthenticationClient
 {
+    Task Create(CreateAuthRequest request, CancellationToken cancellationToken = default);
+
     Task<AuthenticateResponse> Login(AuthenticateRequest request, CancellationToken cancellationToken = default);
 
     Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default);

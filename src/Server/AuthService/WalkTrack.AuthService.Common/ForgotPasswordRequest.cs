@@ -25,5 +25,5 @@ public sealed record ForgotPasswordRequest
 {
     /// <summary>
     /// </summary>
-    public string Email { get; init; } = string.Empty;
+    public string Username { get; init; } = string.Empty;
 }

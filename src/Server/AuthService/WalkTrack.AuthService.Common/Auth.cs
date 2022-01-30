@@ -34,10 +34,6 @@ public sealed record Auth: IResource
 
     /// <summary>
     /// </summary>
-    public string Email { get; init; } = string.Empty;
-
-    /// <summary>
-    /// </summary>
     public string Password { get; init; } = string.Empty;
 
     /// <summary>

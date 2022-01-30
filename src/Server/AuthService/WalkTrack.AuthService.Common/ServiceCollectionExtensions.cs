@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         collection
             .AddSingleton<ITranscoder, AuthenticateRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, AuthenticateResponseJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, CreateAuthRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, ForgotPasswordRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, ResetPasswordRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, TokenJsonV1Transcoder>()

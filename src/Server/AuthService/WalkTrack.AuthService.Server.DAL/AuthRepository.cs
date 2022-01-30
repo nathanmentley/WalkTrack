@@ -26,7 +26,6 @@ internal sealed class AuthRepository: BaseRepository<Auth, AuthPresistedResource
 {
     private static readonly IEnumerable<ICriterionHandler> Handlers =
         new ICriterionHandler[] {
-            new EmailCriterionHandler(),
             new IdCriterionHandler(),
             new UsernameCriterionHandler()
         };
@@ -47,7 +46,6 @@ internal sealed class AuthRepository: BaseRepository<Auth, AuthPresistedResource
         {
             Id = Guid.Parse(resource.Id),
             Username = resource.Username,
-            Email = resource.Email,
             Password = resource.Password,
             Salt = resource.Salt,
             ResetToken = resource.ResetToken,
@@ -59,7 +57,6 @@ internal sealed class AuthRepository: BaseRepository<Auth, AuthPresistedResource
         {
             Id = record.Id.ToString(),
             Username = record.Username,
-            Email = record.Email,
             Password = record.Password,
             Salt = record.Salt,
             ResetToken = record.ResetToken,

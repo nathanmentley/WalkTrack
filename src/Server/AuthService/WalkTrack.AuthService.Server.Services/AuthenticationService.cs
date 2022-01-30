@@ -13,14 +13,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-/*
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using WalkTrack.EmailService.Client;
-using WalkTrack.EmailService.Common;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server;
 using WalkTrack.Framework.Server.Exceptions;
@@ -28,8 +26,6 @@ using WalkTrack.AuthService.Common;
 using WalkTrack.AuthService.Common.Criteria;
 using WalkTrack.AuthService.Server.Configuration;
 using WalkTrack.AuthService.Server.Criteria;
-*/
-using WalkTrack.AuthService.Common;
 
 namespace WalkTrack.AuthService.Server.Services;
 
@@ -37,185 +33,208 @@ namespace WalkTrack.AuthService.Server.Services;
 /// </summary>
 internal sealed class AuthenticationService : IAuthenticationService
 {
-    /*
-        private readonly string _adminUsername;
-        private readonly string _adminPassword;
-        private readonly IEmailClient _emailClient;
-        private readonly IUserRepository _repository;
-        private readonly IHashingUtility _hashingUtility;
-        private readonly JwtSecurityTokenHandler _tokenHandler;
-        private readonly SigningCredentials _signingCredentials;
-        private readonly TokenValidationParameters _tokenValidationParameters;
+    private readonly string _adminUsername;
+    private readonly string _adminPassword;
+    private readonly IAuthRepository _repository;
+    private readonly IHashingUtility _hashingUtility;
+    private readonly JwtSecurityTokenHandler _tokenHandler;
+    private readonly SigningCredentials _signingCredentials;
+    private readonly TokenValidationParameters _tokenValidationParameters;
 
-        public AuthenticationService(
-            IOptions<AdminSettings> adminSettings,
-            IOptions<AuthenticationSettings> authenticationSettings,
-            IEmailClient emailClient,
-            IUserRepository repository,
-            IHashingUtility hashingUtility
-        )
+    public AuthenticationService(
+        IOptions<AdminSettings> adminSettings,
+        IOptions<AuthenticationSettings> authenticationSettings,
+        IAuthRepository repository,
+        IHashingUtility hashingUtility
+    )
+    {
+        if (adminSettings is null)
         {
-            if (adminSettings is null)
-            {
-                throw new ArgumentNullException(nameof(adminSettings));
-            }
-
-            if (authenticationSettings is null)
-            {
-                throw new ArgumentNullException(nameof(authenticationSettings));
-            }
-
-            if (emailClient is null)
-            {
-                throw new ArgumentNullException(nameof(emailClient));
-            }
-
-            if (repository is null)
-            {
-                throw new ArgumentNullException(nameof(repository));
-            }
-
-            if (hashingUtility is null)
-            {
-                throw new ArgumentNullException(nameof(hashingUtility));
-            }
-
-            _adminUsername = adminSettings.Value.AdminUsername;
-
-            _adminPassword = adminSettings.Value.AdminPassword;
-
-            _emailClient = emailClient;
-
-            _repository = repository;
-
-            _hashingUtility = hashingUtility;
-
-            _tokenHandler = new JwtSecurityTokenHandler();
-
-            _signingCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
-                SecurityAlgorithms.HmacSha256Signature
-            );
-
-            _tokenValidationParameters = new TokenValidationParameters()
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ClockSkew = TimeSpan.Zero
-            };
+            throw new ArgumentNullException(nameof(adminSettings));
         }
 
-        /// <summary>
-        /// </summary>
-        public async Task<AuthenticateResponse> Authenticate(
-            AuthenticateRequest request,
-            CancellationToken cancellationToken = default
-        )
+        if (authenticationSettings is null)
         {
-            if (request is null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            throw new ArgumentNullException(nameof(authenticationSettings));
+        }
 
-            if (
-                string.Equals(_adminUsername, request.Username, StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(_adminPassword, request.Password, StringComparison.Ordinal)
+        if (repository is null)
+        {
+            throw new ArgumentNullException(nameof(repository));
+        }
+
+        if (hashingUtility is null)
+        {
+            throw new ArgumentNullException(nameof(hashingUtility));
+        }
+
+        _adminUsername = adminSettings.Value.AdminUsername;
+
+        _adminPassword = adminSettings.Value.AdminPassword;
+
+        _repository = repository;
+
+        _hashingUtility = hashingUtility;
+
+        _tokenHandler = new JwtSecurityTokenHandler();
+
+        _signingCredentials = new SigningCredentials(
+            new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
+            SecurityAlgorithms.HmacSha256Signature
+        );
+
+        _tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(authenticationSettings.Value.JwtSecret)),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = TimeSpan.Zero
+        };
+    }
+
+    public async Task<Auth> Create(
+        CreateAuthRequest resource,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if(
+            (
+                await _repository.Search(
+                    new ICriterion[] {
+                        new UsernameCriterion(resource.Username)
+                    },
+                    cancellationToken
+                )
             )
+                .Any()
+        )
+        {
+            throw new InvalidRequestException("Email already exists");
+        }
+
+        string salt = Guid.NewGuid().ToString();
+
+        return await _repository.Create(
+            new Auth() {
+                Id = Guid.NewGuid().ToString(),
+                Salt = salt,
+                Username = resource.Username,
+                Password = _hashingUtility.Hash(resource.Password, salt)
+            },
+            cancellationToken
+        );
+    }
+
+    /// <summary>
+    /// </summary>
+    public async Task<AuthenticateResponse> Authenticate(
+        AuthenticateRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (request is null)
+        {
+            throw new ArgumentNullException(nameof(request));
+        }
+
+        if (
+            string.Equals(_adminUsername, request.Username, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(_adminPassword, request.Password, StringComparison.Ordinal)
+        )
+        {
+            return new AuthenticateResponse()
             {
-                return new AuthenticateResponse()
-                {
-                    Token = GenerateAdminJwtToken()
-                };
-            }
-
-            IEnumerable<User> users = await _repository.Search(
-                new ICriterion[] {
-                    new UsernameCriterion(request.Username)
-                },
-                cancellationToken
-            );
-
-            return users.Count() switch {
-                0 =>
-                    throw new ResourceNotFoundException(),
-                1 =>
-                    BuildResponse(users.Single(), request.Password),
-                _ =>
-                    throw new ResourceNotFoundException()
+                Token = GenerateAdminJwtToken()
             };
         }
 
-        public Task<Token> RefreshToken(
-            Token token,
-            CancellationToken cancellationToken = default
-        )
+        IEnumerable<Auth> auths = await _repository.Search(
+            new ICriterion[] {
+                new UsernameCriterion(request.Username)
+            },
+            cancellationToken
+        );
+
+        return auths.Count() switch {
+            0 =>
+                throw new ResourceNotFoundException(),
+            1 =>
+                BuildResponse(auths.Single(), request.Password),
+            _ =>
+                throw new ResourceNotFoundException()
+        };
+    }
+
+    public Task<Token> RefreshToken(
+        Token token,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (token is null)
         {
-            if (token is null)
-            {
-                throw new ArgumentNullException(nameof(token));
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            ClaimsPrincipal indentity =
-                _tokenHandler.ValidateToken(token.Id, _tokenValidationParameters, out SecurityToken validatedToken);
-
-            if (validatedToken is not JwtSecurityToken jwtToken)
-            {
-                throw new InvalidOperationException("Cannot process authentication because the token isn't a valid JWT.");
-            }
-
-            Claim? idClaim =
-                indentity.Claims.FirstOrDefault(claim =>
-                    string.Equals(claim.Type, "id", StringComparison.OrdinalIgnoreCase)
-                );
-
-            if (idClaim is null)
-            {
-                throw new InvalidOperationException("Cannot process authentication because the token doesn't contain required claims.");
-            }
-
-            return Task.FromResult(
-                new Token() { Id = GenerateJwtToken(idClaim.Value) }
-            );
+            throw new ArgumentNullException(nameof(token));
         }
 
-        /// <summary>
-        /// </summary>
-        public async Task RequestForgottenPassword(
-            ForgotPasswordRequest request,
-            CancellationToken cancellationToken = default
-        )
+        cancellationToken.ThrowIfCancellationRequested();
+
+        ClaimsPrincipal indentity =
+            _tokenHandler.ValidateToken(token.Id, _tokenValidationParameters, out SecurityToken validatedToken);
+
+        if (validatedToken is not JwtSecurityToken jwtToken)
         {
-            IEnumerable<User> users = await _repository.Search(
-                new []
-                {
-                    new EmailCriterion(request.Email)
-                },
-                cancellationToken
-            );
-
-            User? user = users.FirstOrDefault();
-
-            if (user is null)
-            {
-                return;
-            }
-
-            user = user with {
-                ResetToken = Guid.NewGuid().ToString(),
-                ResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30)
-            };
-
-            user = await _repository.Update(user, cancellationToken);
-
-            await SendForgotPasswordEmail(user, request, cancellationToken);
+            throw new InvalidOperationException("Cannot process authentication because the token isn't a valid JWT.");
         }
 
+        Claim? idClaim =
+            indentity.Claims.FirstOrDefault(claim =>
+                string.Equals(claim.Type, "id", StringComparison.OrdinalIgnoreCase)
+            );
+
+        if (idClaim is null)
+        {
+            throw new InvalidOperationException("Cannot process authentication because the token doesn't contain required claims.");
+        }
+
+        return Task.FromResult(
+            new Token() { Id = GenerateJwtToken(idClaim.Value) }
+        );
+    }
+
+    /// <summary>
+    /// </summary>
+    public async Task RequestForgottenPassword(
+        ForgotPasswordRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        IEnumerable<Auth> users = await _repository.Search(
+            new []
+            {
+                new UsernameCriterion(request.Username)
+            },
+            cancellationToken
+        );
+
+        Auth? auth = users.FirstOrDefault();
+
+        if (auth is null)
+        {
+            return;
+        }
+
+        auth = auth with {
+            ResetToken = Guid.NewGuid().ToString(),
+            ResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(30)
+        };
+
+        auth = await _repository.Update(auth, cancellationToken);
+
+        //await SendForgotPasswordEmail(auth, request, cancellationToken);
+    }
+/*
         private async Task SendForgotPasswordEmail(
-            User user,
+            Auth auth,
             ForgotPasswordRequest request,
             CancellationToken cancellationToken
         ) =>
@@ -223,117 +242,97 @@ internal sealed class AuthenticationService : IAuthenticationService
                 new [] {
                     new Email()
                     {
-                        To = user.Username,
+                        To = auth.Username,
                         ToAddress = request.Email,
                         From = "WalkTrack",
                         FromAddress = "noreply@Walktrack.PokeTriRx.com",
                         Subject = "Password Reset Request",
-                        HtmlMessage = $"Token: {user.ResetToken}",
-                        TextMessage = $"Token: {user.ResetToken}"
+                        HtmlMessage = $"Token: {auth.ResetToken}",
+                        TextMessage = $"Token: {auth.ResetToken}"
                     }
                 },
                 cancellationToken
             );
-
-        /// <summary>
-        /// </summary>
-        public async Task<AuthenticateResponse> ResetPassword(
-            ResetPasswordRequest request,
-            CancellationToken cancellationToken = default
-        )
-        {
-            IEnumerable<User> users = await _repository.Search(
-                new ICriterion[]
-                {
-                    new EmailCriterion(request.Email),
-                    new ResetTokenCriterion(request.Token)
-                },
-                cancellationToken
-            );
-
-            User? user = users.FirstOrDefault();
-
-            if (user is null)
+*/
+    /// <summary>
+    /// </summary>
+    public async Task<AuthenticateResponse> ResetPassword(
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        IEnumerable<Auth> auths = await _repository.Search(
+            new ICriterion[]
             {
-                throw new Exception("TODO");
-            }
+                new UsernameCriterion(request.Username),
+                new ResetTokenCriterion(request.Token)
+            },
+            cancellationToken
+        );
 
-            string salt = Guid.NewGuid().ToString();
+        Auth? auth = auths.FirstOrDefault();
 
-            user = user with { Password = _hashingUtility.Hash(request.Password, salt), Salt = salt };
-
-            await _repository.Update(user, cancellationToken);
-
-            return BuildResponse(user, request.Password);
+        if (auth is null)
+        {
+            throw new Exception("TODO");
         }
 
-        private AuthenticateResponse BuildResponse(User user, string password)
+        string salt = Guid.NewGuid().ToString();
+
+        auth = auth with { Password = _hashingUtility.Hash(request.Password, salt), Salt = salt };
+
+        await _repository.Update(auth, cancellationToken);
+
+        return BuildResponse(auth, request.Password);
+    }
+
+    private AuthenticateResponse BuildResponse(Auth auth, string password)
+    {
+        string hash = _hashingUtility.Hash(password, auth.Salt);
+
+        if (string.Equals(auth.Password, hash, StringComparison.Ordinal))
         {
-            string hash = _hashingUtility.Hash(password, user.Salt);
-
-            if (string.Equals(user.Password, hash, StringComparison.Ordinal))
+            return new AuthenticateResponse()
             {
-                return new AuthenticateResponse()
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Token = GenerateJwtToken(user.Id)
-                };
-            }
-
-            throw new ResourceNotFoundException();
+                Id = auth.Id,
+                Username = auth.Username,
+                Token = GenerateJwtToken(auth.Id)
+            };
         }
 
-        private string GenerateAdminJwtToken() =>
-            _tokenHandler.WriteToken(
-                _tokenHandler.CreateToken(
-                    new SecurityTokenDescriptor()
-                    {
-                        SigningCredentials = _signingCredentials,
-                        Expires = DateTime.UtcNow.AddDays(7),
-                        Subject = new ClaimsIdentity(
-                            new[] {
-                                new Claim("id", "n/a"),
-                                new Claim("admin", "admin")
-                            }
-                        )
-                    }
-                )
-            );
-
-        private string GenerateJwtToken(string userId) =>
-            _tokenHandler.WriteToken(
-                _tokenHandler.CreateToken(
-                    new SecurityTokenDescriptor()
-                    {
-                        SigningCredentials = _signingCredentials,
-                        Expires = DateTime.UtcNow.AddDays(7),
-                        Subject = new ClaimsIdentity(
-                            new[] {
-                                new Claim("id", userId)
-                            }
-                        )
-                    }
-                )
-            );
-    */
-    public Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
+        throw new ResourceNotFoundException();
     }
 
-    public Task<Token> RefreshToken(Token token, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    private string GenerateAdminJwtToken() =>
+        _tokenHandler.WriteToken(
+            _tokenHandler.CreateToken(
+                new SecurityTokenDescriptor()
+                {
+                    SigningCredentials = _signingCredentials,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Subject = new ClaimsIdentity(
+                        new[] {
+                            new Claim("id", "n/a"),
+                            new Claim("admin", "admin")
+                        }
+                    )
+                }
+            )
+        );
 
-    public Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
+    private string GenerateJwtToken(string authId) =>
+        _tokenHandler.WriteToken(
+            _tokenHandler.CreateToken(
+                new SecurityTokenDescriptor()
+                {
+                    SigningCredentials = _signingCredentials,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Subject = new ClaimsIdentity(
+                        new[] {
+                            new Claim("id", authId)
+                        }
+                    )
+                }
+            )
+        );
 }

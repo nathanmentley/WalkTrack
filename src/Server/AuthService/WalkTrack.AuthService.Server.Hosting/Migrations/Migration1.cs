@@ -27,7 +27,6 @@ public class Migration1: Migration
             .Table("Auths")
             .WithColumn("Id").AsGuid().NotNullable().PrimaryKey().Unique()
             .WithColumn("Username").AsString(255).NotNullable().Unique()
-            .WithColumn("Email").AsString(255).NotNullable().Unique()
             .WithColumn("Password").AsString(255).NotNullable()
             .WithColumn("Salt").AsString(255).NotNullable()
             .WithColumn("ResetToken").AsString(255).WithDefaultValue(string.Empty).NotNullable()

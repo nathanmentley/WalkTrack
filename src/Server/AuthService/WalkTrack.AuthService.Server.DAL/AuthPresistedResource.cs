@@ -26,7 +26,6 @@ internal sealed class AuthPresistedResource: BasePresistedResource
 
     internal Guid Id { get; init; } = Guid.Empty;
     internal string Username { get; init; } = string.Empty;
-    internal string Email { get; init; } = string.Empty;
     internal string Password { get; init; } = string.Empty;
     internal string Salt { get; init; } = string.Empty;
     internal string ResetToken { get; init; } = string.Empty;

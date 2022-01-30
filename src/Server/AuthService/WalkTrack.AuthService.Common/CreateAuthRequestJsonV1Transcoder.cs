@@ -22,31 +22,29 @@ namespace WalkTrack.AuthService.Common;
 
 /// <summary>
 /// </summary>
-internal sealed class ResetPasswordRequestJsonV1Transcoder : BaseJsonTranscoder<ResetPasswordRequest>, ITranscoder
+internal sealed class CreateAuthRequestJsonV1Transcoder: BaseJsonTranscoder<CreateAuthRequest>, ITranscoder
 {
     private static readonly WalkTrackMediaType _supportedMediaType =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
             .WithSubType(WalkTrackMediaTypeSubTypes.Json)
-            .WithStructure("WalkTrack.ResetPasswordRequest")
+            .WithStructure("WalkTrack.CreateAuthRequest")
             .WithVersion(1)
             .Build();
 
     protected override WalkTrackMediaType GetSupportedMediaType() =>
         _supportedMediaType;
 
-    public override JsonObject Encode(ResetPasswordRequest resource) =>
+    public override JsonObject Encode(CreateAuthRequest resource) =>
         new JsonObjectBuilder()
             .With("username", resource.Username)
-            .With("token", resource.Token)
             .With("password", resource.Password)
             .Build();
 
-    public override ResetPasswordRequest Decode(JsonObject jsonObject) =>
-        new ResetPasswordRequest()
+    public override CreateAuthRequest Decode(JsonObject jsonObject) =>
+        new CreateAuthRequest()
         {
             Username = GetValue(jsonObject, "username", string.Empty),
-            Token = GetValue(jsonObject, "token", string.Empty),
             Password = GetValue(jsonObject, "password", string.Empty)
         };
 }

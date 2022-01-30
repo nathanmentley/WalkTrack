@@ -31,7 +31,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection WithAuthClient(this IServiceCollection collection, string authUrl) =>
         collection
             .AddSingleton<IAuthenticationClient>(
-                sp => new AuthenticationClient(authUrl, sp.GetRequiredService<ITranscoderProcessor>())
+                sp => new AuthenticationClient(
+                    authUrl,
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
             );
 
     /// <summary>
@@ -46,6 +50,7 @@ public static class ServiceCollectionExtensions
                     configuration
                         .GetSection("ServiceAuthenticatorSettings")
                         .GetValue<string>("AuthAddress"),
+                    sp.GetRequiredService<IAuthenticator>(),
                     sp.GetRequiredService<ITranscoderProcessor>()
                 )
             )

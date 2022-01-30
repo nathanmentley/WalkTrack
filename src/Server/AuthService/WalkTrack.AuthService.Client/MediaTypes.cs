@@ -28,6 +28,14 @@ internal static class MediaTypes
             .WithVersion(1)
             .Build();
 
+    public static readonly WalkTrackMediaType CreateAuthRequest =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.CreateAuthRequest")
+            .WithVersion(1)
+            .Build();
+
     public static readonly WalkTrackMediaType AuthenticateRequest =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)

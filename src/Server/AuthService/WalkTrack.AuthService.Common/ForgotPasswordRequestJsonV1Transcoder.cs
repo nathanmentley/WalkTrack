@@ -37,12 +37,12 @@ internal sealed class ForgotPasswordRequestJsonV1Transcoder : BaseJsonTranscoder
 
     public override JsonObject Encode(ForgotPasswordRequest resource) =>
         new JsonObjectBuilder()
-            .With("email", resource.Email)
+            .With("username", resource.Username)
             .Build();
 
     public override ForgotPasswordRequest Decode(JsonObject jsonObject) =>
         new ForgotPasswordRequest()
         {
-            Email = GetValue(jsonObject, "email", string.Empty)
+            Username = GetValue(jsonObject, "username", string.Empty)
         };
 }

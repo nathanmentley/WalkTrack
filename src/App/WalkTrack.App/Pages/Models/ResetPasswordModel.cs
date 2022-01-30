@@ -29,6 +29,6 @@ public sealed class ResetPasswordModel
         {
             Password = Password,
             Token = resetToken,
-            Email = email
+            Username = email
         };
 }
