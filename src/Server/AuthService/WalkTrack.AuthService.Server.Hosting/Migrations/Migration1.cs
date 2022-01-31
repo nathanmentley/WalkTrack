@@ -24,27 +24,14 @@ public class Migration1: Migration
     public override void Up()
     {
         Create
-            .Table("Auths")
+            .Table("Permissions")
             .WithColumn("Id").AsGuid().NotNullable().PrimaryKey().Unique()
-            .WithColumn("Username").AsString(255).NotNullable().Unique()
-            .WithColumn("Password").AsString(255).NotNullable()
-            .WithColumn("Salt").AsString(255).NotNullable()
-            .WithColumn("ResetToken").AsString(255).WithDefaultValue(string.Empty).NotNullable()
-            .WithColumn("ResetTokenExpiresAt").AsDateTime2().WithDefaultValue(DateTime.MinValue).NotNullable();
-
-        Create
-            .Index("index_auths_username")
-            .OnTable("Auths")
-            .OnColumn("Username")
-            .Unique();
+            .WithColumn("Name").AsString(255).NotNullable().Unique();
     }
 
     public override void Down()
     {
         Delete
-            .Table("Auths");
-
-        Delete
-            .Index("index_auths_username");
+            .Table("Permissions");
     }
 }

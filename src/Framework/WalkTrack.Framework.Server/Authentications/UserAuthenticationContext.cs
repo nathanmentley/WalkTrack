@@ -23,4 +23,6 @@ public sealed record UserAuthenticationContext: AuthenticationContext
     /// <summary>
     /// </summary>
     public string UserId { get; init; } = string.Empty;
+
+    public UserAuthenticationContext(string token): base(token) {}
 }

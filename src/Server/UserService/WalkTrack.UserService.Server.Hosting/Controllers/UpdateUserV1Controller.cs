@@ -22,7 +22,7 @@ using WalkTrack.UserService.Common;
 namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[JwtAuthorize]
+[Authorize("")]
 [Route("v1/user")]
 public sealed class UpdateUserV1Controller: ControllerBase
 {

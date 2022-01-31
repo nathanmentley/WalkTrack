@@ -20,4 +20,15 @@ namespace WalkTrack.Framework.Server.Authentications;
 /// </summary>
 public abstract record AuthenticationContext
 {
+    public string Token { get; }
+
+    protected AuthenticationContext(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw new ArgumentNullException(nameof(token));
+        }
+
+        Token = token;
+    }
 }

@@ -46,6 +46,7 @@ services:
     - DalSettings__ConnectionString=${MSSQL_AUTH_CONNECTION_STRING}
     - AdminSettings__AdminUsername=${ADMIN_USERNAME}
     - AdminSettings__AdminPassword=${ADMIN_PASSWORD}
+    - ServiceAuthorizationSettings__AuthAddress=http://authservice:8000/
     - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8000
@@ -61,6 +62,7 @@ services:
     environment:
     - AuthenticationSettings__JwtSecret=${JWT_SECRET}
     - ConnectionSettings__ApiKey=${SENDGRID_API_KEY}
+    - ServiceAuthorizationSettings__AuthAddress=http://authservice:8000/
     - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8003
@@ -80,6 +82,7 @@ services:
     - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
     - DalSettings__Username=${COUCHDB_USER}
     - DalSettings__Password=${COUCHDB_PASSWORD}
+    - ServiceAuthorizationSettings__AuthAddress=http://authservice:8000/
     - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8001
@@ -100,6 +103,7 @@ services:
     - DalSettings__ConnectionString=${COUCHDB_CONNECTION_STRING}
     - DalSettings__Username=${COUCHDB_USER}
     - DalSettings__Password=${COUCHDB_PASSWORD}
+    - ServiceAuthorizationSettings__AuthAddress=http://authservice:8000/
     - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8002
@@ -119,6 +123,7 @@ services:
     - AuthenticationSettings__JwtSecret=${JWT_SECRET}
     - DalSettings__ConnectionString=${MSSQL_USER_CONNECTION_STRING}
     - EmailServiceSettings__Url=http://emailservice:8003/
+    - ServiceAuthorizationSettings__AuthAddress=http://authservice:8000/
     - ServiceAuthenticatorSettings__AuthAddress=http://authservice:8000/
     expose:
     - 8004

@@ -15,6 +15,9 @@
 */
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
+using WalkTrack.AuthService.Server.DAL.Authentications;
+using WalkTrack.AuthService.Server.DAL.Permissions;
+using WalkTrack.AuthService.Server.DAL.Roles;
 
 namespace WalkTrack.AuthService.Server.DAL;
 
@@ -27,5 +30,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection WithAuthDAL(this IServiceCollection collection) =>
         collection
-            .AddSingleton<IAuthRepository, AuthRepository>();
+            .AddSingleton<IAuthenticationRepository, AuthenticationRepository>()
+            .AddSingleton<IPermissionRepository, PermissionRepository>()
+            .AddSingleton<IRoleRepository, RoleRepository>();
 }

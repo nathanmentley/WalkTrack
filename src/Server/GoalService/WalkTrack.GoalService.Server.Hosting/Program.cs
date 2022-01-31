@@ -39,6 +39,7 @@ builder
         .WithGoalServices()
 
         .WithAuthTranscoders()
+        .WithServiceAuthorization(builder.Configuration)
         .WithServiceAuthentication(builder.Configuration);
 
 WebApplication app = builder.Build();

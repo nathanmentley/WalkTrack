@@ -22,7 +22,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.EmailService.Server.Hosting.Controllers;
 
 [ApiController]
-[JwtAuthorize]
+[Authorize("")]
 [Route("v1/email/send")]
 public class SendEmailV1Controller : ControllerBase
 {

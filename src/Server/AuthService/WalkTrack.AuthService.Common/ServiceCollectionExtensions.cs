@@ -30,9 +30,15 @@ public static class ServiceCollectionExtensions
         collection
             .AddSingleton<ITranscoder, AuthenticateRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, AuthenticateResponseJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, AuthorizeRequestJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, AuthorizeResponseJsonV1Transcoder>()
             .AddSingleton<ITranscoder, CreateAuthRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, ForgotPasswordRequestJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, PermissionCollectionJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, PermissionJsonV1Transcoder>()
             .AddSingleton<ITranscoder, ResetPasswordRequestJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, RoleCollectionJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, RoleJsonV1Transcoder>()
             .AddSingleton<ITranscoder, TokenJsonV1Transcoder>()
             .AddSingleton<ITranscoder, UpdatePasswordRequestJsonV1Transcoder>();
 }

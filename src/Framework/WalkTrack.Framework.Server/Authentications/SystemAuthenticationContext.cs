@@ -20,4 +20,5 @@ namespace WalkTrack.Framework.Server.Authentications;
 /// </summary>
 public sealed record SystemAuthenticationContext: AuthenticationContext
 {
+    public SystemAuthenticationContext(string token): base(token) {}
 }

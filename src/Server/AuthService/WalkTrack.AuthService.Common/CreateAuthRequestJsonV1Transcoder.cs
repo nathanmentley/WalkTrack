@@ -39,12 +39,14 @@ internal sealed class CreateAuthRequestJsonV1Transcoder: BaseJsonTranscoder<Crea
         new JsonObjectBuilder()
             .With("username", resource.Username)
             .With("password", resource.Password)
+            .With("roleId", resource.RoleId)
             .Build();
 
     public override CreateAuthRequest Decode(JsonObject jsonObject) =>
         new CreateAuthRequest()
         {
             Username = GetValue(jsonObject, "username", string.Empty),
-            Password = GetValue(jsonObject, "password", string.Empty)
+            Password = GetValue(jsonObject, "password", string.Empty),
+            RoleId = GetValue(jsonObject, "roleId", string.Empty)
         };
 }

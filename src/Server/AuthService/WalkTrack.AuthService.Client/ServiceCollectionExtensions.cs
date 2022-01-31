@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
+using WalkTrack.Framework.Server.Authorizations;
 
 namespace WalkTrack.AuthService.Client;
 
@@ -36,7 +37,46 @@ public static class ServiceCollectionExtensions
                     sp.GetRequiredService<IAuthenticator>(),
                     sp.GetRequiredService<ITranscoderProcessor>()
                 )
+            )
+            .AddSingleton<IAuthorizationClient>(
+                sp => new AuthorizationClient(
+                    authUrl,
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
+            )
+            .AddSingleton<IPermissionClient>(
+                sp => new PermissionClient(
+                    authUrl,
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
+            )
+            .AddSingleton<IRoleClient>(
+                sp => new RoleClient(
+                    authUrl,
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
             );
+
+    /// <summary>
+    /// </summary>
+    public static IServiceCollection WithServiceAuthorization(
+        this IServiceCollection collection,
+        IConfiguration configuration
+    ) =>
+        collection
+            .AddSingleton<IAuthenticationClient>(
+                sp => new AuthenticationClient(
+                    configuration
+                        .GetSection("ServiceAuthorizationSettings")
+                        .GetValue<string>("AuthAddress"),
+                    sp.GetRequiredService<IAuthenticator>(),
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
+            )
+            .AddSingleton<IAuthorizer, ServiceAuthorizer>();
 
     /// <summary>
     /// </summary>

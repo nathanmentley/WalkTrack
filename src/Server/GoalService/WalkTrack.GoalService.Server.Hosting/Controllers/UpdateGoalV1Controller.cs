@@ -23,7 +23,7 @@ using WalkTrack.GoalService.Common;
 namespace WalkTrack.GoalService.Server.Hosting.Controllers;
 
 [ApiController]
-[JwtAuthorize]
+[Authorize("")]
 [Route("v1/goal")]
 public sealed class UpdateGoalV1Controller: ControllerBase
 {

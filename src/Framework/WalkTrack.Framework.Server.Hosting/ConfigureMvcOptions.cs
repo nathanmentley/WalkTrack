@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using System.Diagnostics.CodeAnalysis;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.Exceptions;
+using WalkTrack.Framework.Server.Hosting.Attributes;
 using WalkTrack.Framework.Server.Hosting.ExceptionFilters.Core;
 using WalkTrack.Framework.Server.Hosting.Formatters;
 
@@ -98,5 +99,9 @@ internal class ConfigureMvcOptions : IConfigureOptions<MvcOptions>
                 _lastResortHandler
             )
         );
+
+        _logger.LogTrace("Setting up exception authorize filter.");
+
+        options.Filters.AddService<AuthorizeActionFilter>();
     }
 }

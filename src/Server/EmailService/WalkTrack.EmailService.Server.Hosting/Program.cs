@@ -39,6 +39,7 @@ builder
         .WithEmailServices()
 
         .WithAuthTranscoders()
+        .WithServiceAuthorization(builder.Configuration)
         .WithServiceAuthentication(builder.Configuration);
 
 WebApplication app = builder.Build();

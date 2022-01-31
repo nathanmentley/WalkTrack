@@ -78,13 +78,13 @@ internal sealed class JwtMiddleware
 
             if (jwtToken.Claims.FirstOrDefault(x => x.Type == "admin")?.Value == "admin")
             {
-                context.Items["AuthenticationContext"] = new SystemAuthenticationContext();
+                context.Items["AuthenticationContext"] = new SystemAuthenticationContext(token);
             }
             else
             {
                 string userId = jwtToken.Claims.First(x => x.Type == "id").Value;
 
-                context.Items["AuthenticationContext"] = new UserAuthenticationContext()
+                context.Items["AuthenticationContext"] = new UserAuthenticationContext(token)
                 {
                     UserId = userId
                 };

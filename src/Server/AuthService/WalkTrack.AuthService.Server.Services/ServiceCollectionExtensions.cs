@@ -18,6 +18,9 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WalkTrack.AuthService.Server.Configuration;
+using WalkTrack.AuthService.Server.Services.Authentications;
+using WalkTrack.AuthService.Server.Services.Permissions;
+using WalkTrack.AuthService.Server.Services.Roles;
 
 namespace WalkTrack.AuthService.Server.Services;
 
@@ -31,6 +34,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection WithAuthServices(this IServiceCollection collection, IConfiguration configuration) =>
         collection
             .AddSingleton<IAuthenticationService, AuthenticationService>()
+            .AddSingleton<IAuthorizationService, AuthorizationService>()
+            .AddSingleton<IPermissionService, PermissionService>()
+            .AddSingleton<IRoleService, RoleService>()
             .AddSingleton<IHashingUtility, HashingUtility>()
 
             .Configure<AdminSettings>(configuration.GetSection("AdminSettings"))

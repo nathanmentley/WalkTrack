@@ -24,7 +24,7 @@ using WalkTrack.UserService.Common;
 namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[JwtAdminAuthorize]
+[Authorize("")]
 [Route("v1/user")]
 public sealed class SearchUserV1Controller: ControllerBase
 {

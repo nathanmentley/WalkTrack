@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Framework\WalkTrack.Framework.Client\WalkTrack.Framework.Client.csproj" />
+    <ProjectReference Include="..\..\..\Framework\WalkTrack.Framework.Server\WalkTrack.Framework.Server.csproj" />
 
     <ProjectReference Include="..\WalkTrack.AuthService.Common\WalkTrack.AuthService.Common.csproj" />
   </ItemGroup>

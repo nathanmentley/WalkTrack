@@ -23,7 +23,7 @@ using WalkTrack.UserService.Common;
 namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[JwtAuthorize]
+[Authorize("")]
 [Route("v1/user/{id}")]
 public sealed class FetchUserV1Controller: ControllerBase
 {

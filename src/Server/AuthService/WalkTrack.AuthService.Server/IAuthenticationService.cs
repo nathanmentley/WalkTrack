@@ -22,7 +22,7 @@ namespace WalkTrack.AuthService.Server;
 /// </summary>
 public interface IAuthenticationService
 {
-    Task<Auth> Create(
+    Task<Authentication> Create(
         CreateAuthRequest resource,
         CancellationToken cancellationToken = default
     );

@@ -68,6 +68,7 @@ public static class Program
             .WithUserServices(configuration)
 
             .WithAuthTranscoders()
+            .WithServiceAuthorization(configuration)
             .WithServiceAuthentication(configuration)
 
             .AddFluentMigratorCore()

@@ -52,6 +52,22 @@ internal static class MediaTypes
             .WithVersion(1)
             .Build();
 
+    public static readonly WalkTrackMediaType AuthorizeRequest =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.AuthorizeRequest")
+            .WithVersion(1)
+            .Build();
+
+    public static readonly WalkTrackMediaType AuthorizeResponse =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.AuthorizeResponse")
+            .WithVersion(1)
+            .Build();
+
     public static readonly WalkTrackMediaType Token =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
@@ -73,6 +89,38 @@ internal static class MediaTypes
             .WithType(WalkTrackMediaTypeTypes.Application)
             .WithSubType(WalkTrackMediaTypeSubTypes.Json)
             .WithStructure("WalkTrack.ResetPasswordRequest")
+            .WithVersion(1)
+            .Build();
+
+    public static readonly WalkTrackMediaType Role =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Role")
+            .WithVersion(1)
+            .Build();
+
+    public static readonly WalkTrackMediaType Roles =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Roles")
+            .WithVersion(1)
+            .Build();
+
+    public static readonly WalkTrackMediaType Permission =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Permission")
+            .WithVersion(1)
+            .Build();
+
+    public static readonly WalkTrackMediaType Permissions =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.Permissions")
             .WithVersion(1)
             .Build();
 }
