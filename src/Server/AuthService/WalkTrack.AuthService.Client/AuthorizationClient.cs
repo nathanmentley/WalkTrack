@@ -17,26 +17,20 @@
 using Flurl;
 using WalkTrack.AuthService.Common;
 using WalkTrack.Framework.Client;
-using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
 
 namespace WalkTrack.AuthService.Client;
 
 internal sealed class AuthorizationClient: BaseClient, IAuthorizationClient, IDisposable
 {
-    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
     public AuthorizationClient(
         string url,
-        IAuthenticator authenicator,
         ITranscoderProcessor transcoder
     )
     {
-        _authenicator = authenicator ??
-            throw new ArgumentNullException(nameof(authenicator));
-
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
 

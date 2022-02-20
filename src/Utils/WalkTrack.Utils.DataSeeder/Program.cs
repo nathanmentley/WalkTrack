@@ -54,11 +54,14 @@ public static class Program
             .WithServiceAuthentication(configuration)
 
             .AddSingleton<IDataLoader, RoleDataLoader>()
-            .AddSingleton<IDataLoader, PermissionDataLoader>()
-            .AddSingleton<IDataLoader, RolePermissionsDataLoader>()
-            .AddSingleton<IDataLoader, GoalDataLoader>()
+            //.AddSingleton<IDataLoader, PermissionDataLoader>()
+            //.AddSingleton<IDataLoader, RolePermissionsDataLoader>()
+            //.AddSingleton<IDataLoader, GoalDataLoader>()
 
             .AddSingleton<App>()
+
+            .Configure<ServiceAuthenticatorSettings>(configuration.GetSection("ServiceAuthenticatorSettings"))
+
             .BuildServiceProvider();
 
     private static IConfiguration GetConfiguration() =>

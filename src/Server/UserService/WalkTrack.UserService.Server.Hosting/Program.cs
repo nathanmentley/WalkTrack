@@ -21,7 +21,6 @@ using WalkTrack.Framework.Server.Hosting;
 using WalkTrack.UserService.Common;
 using WalkTrack.UserService.Server.Configuration;
 using WalkTrack.UserService.Server.DAL;
-using WalkTrack.UserService.Server.Hosting.Controllers;
 using WalkTrack.UserService.Server.Services;
 
 namespace WalkTrack.UserService.Server.Hosting;
@@ -68,6 +67,11 @@ public static class Program
             .WithUserServices(configuration)
 
             .WithAuthTranscoders()
+            .WithAuthClient(
+                configuration
+                    .GetSection("ServiceAuthenticatorSettings")
+                    .GetValue<string>("AuthAddress")
+            )
             .WithServiceAuthorization(configuration)
             .WithServiceAuthentication(configuration)
 

@@ -120,6 +120,7 @@ internal sealed class AuthenticationService : IAuthenticationService
                 Id = Guid.NewGuid().ToString(),
                 Salt = salt,
                 Username = resource.Username,
+                RoleId = resource.RoleId,
                 Password = _hashingUtility.Hash(resource.Password, salt)
             },
             cancellationToken

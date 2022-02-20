@@ -24,7 +24,7 @@ using WalkTrack.GoalService.Common;
 namespace WalkTrack.GoalService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("")]
+[Authorize("TODO")]
 [Route("v1/goal")]
 public sealed class SearchGoalV1Controller: ControllerBase
 {

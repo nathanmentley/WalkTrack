@@ -47,9 +47,8 @@ internal sealed class ServiceAuthenticator : IAuthenticator
             await Login(cancellationToken);
         }
 
-        return _cachedResponse is null ?
-            throw new UnauthorizedClientException():
-            _cachedResponse.Token;
+        return _cachedResponse?.Token ??
+            throw new UnauthorizedClientException();
     }
 
     private async Task Login(CancellationToken cancellationToken = default)

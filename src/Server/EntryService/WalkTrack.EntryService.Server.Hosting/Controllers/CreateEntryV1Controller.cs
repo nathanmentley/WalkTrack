@@ -23,7 +23,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.EntryService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("")]
+[Authorize("TODO")]
 [Route("v1/entry")]
 public sealed class CreateEntryV1Controller: ControllerBase
 {

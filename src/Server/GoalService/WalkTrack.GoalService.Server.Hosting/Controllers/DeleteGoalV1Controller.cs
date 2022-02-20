@@ -22,7 +22,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.GoalService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("")]
+[Authorize("TODO")]
 [Route("v1/goal/{id}")]
 public sealed class DeleteGoalV1Controller: ControllerBase
 {

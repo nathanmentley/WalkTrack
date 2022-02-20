@@ -27,15 +27,20 @@ namespace WalkTrack.UserService.Server.Services;
 internal sealed class UserService: IUserService
 {
     private readonly IAuthenticationClient _authenticationClient;
+    private IRoleClient _roleClient;
     private readonly IUserRepository _repository;
 
     public UserService(
         IAuthenticationClient authenticationClient,
+        IRoleClient roleClient,
         IUserRepository repository
     )
     {
         _authenticationClient = authenticationClient ??
             throw new ArgumentNullException(nameof(authenticationClient));
+
+        _roleClient = roleClient ??
+            throw new ArgumentNullException(nameof(roleClient));
 
         _repository = repository ??
             throw new ArgumentNullException(nameof(repository));
@@ -99,7 +104,8 @@ internal sealed class UserService: IUserService
             new CreateAuthRequest()
             {
                 Username = resource.Username,
-                Password = resource.Password
+                Password = resource.Password,
+                RoleId = await GetRoleId(cancellationToken)
             },
             cancellationToken
         );
@@ -110,6 +116,22 @@ internal sealed class UserService: IUserService
             },
             cancellationToken
         );
+    }
+
+    private async Task<string> GetRoleId(CancellationToken cancellationToken)
+    {
+        IEnumerable<Role> roles = await _roleClient.Search(cancellationToken);
+
+        Role? userRole = roles.FirstOrDefault(role => string.Equals(role.Name, "user"));
+
+        if (userRole is not null)
+        {
+            return userRole.Id;
+        }
+        else
+        {
+            throw new Exception("TODO");
+        }
     }
 
     public async Task<User> Update(

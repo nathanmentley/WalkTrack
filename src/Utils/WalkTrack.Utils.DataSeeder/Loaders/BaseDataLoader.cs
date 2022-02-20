@@ -47,14 +47,14 @@ public abstract class BaseDataLoader<T> : IDataLoader
             .Where(file =>
                 file.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
             )
-            .Select(file => file.Name);
+            .Select(file => file.FullName);
 
     protected async Task<T> ReadRecord(
         string filename,
         CancellationToken cancellationToken = default
     )
     {
-        using FileStream stream = File.Create(filename);
+        using FileStream stream = File.OpenRead(filename);
 
         return await _transcoderProcessor.Decode<T>(
             MediaType,

@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using WalkTrack.Framework.Common.ApiErrorResponses;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.Exceptions;
+using WalkTrack.Framework.Server.Hosting.Attributes;
 using WalkTrack.Framework.Server.Hosting.ExceptionFilters;
 
 namespace WalkTrack.Framework.Server.Hosting;
@@ -50,6 +51,8 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IExceptionHandler, UnparsableResourceExceptionHandler>()
 
             .AddSingleton<ILastResortExceptionHandler, LastResortExceptionHandler>()
+
+            .AddSingleton<AuthorizeActionFilter>()
 
             .AddSingleton<IConfigureOptions<MvcOptions>, ConfigureMvcOptions>()
 

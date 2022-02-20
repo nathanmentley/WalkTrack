@@ -18,25 +18,19 @@ using Flurl;
 using WalkTrack.Framework.Client;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.AuthService.Common;
-using WalkTrack.Framework.Client.Authentications;
 
 namespace WalkTrack.AuthService.Client;
 
 internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, IDisposable
 {
-    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
     public AuthenticationClient(
         string url,
-        IAuthenticator authenicator,
         ITranscoderProcessor transcoder
     )
     {
-        _authenicator = authenicator ??
-            throw new ArgumentNullException(nameof(authenicator));
-
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
 
@@ -62,7 +56,6 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, I
             .WithAcceptType(MediaTypes.ApiError)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
-            .WithAuthenticator(_authenicator)
             .Send<CreateAuthRequest>(_httpClient, cancellationToken);
 
     public async Task<AuthenticateResponse> Login(
