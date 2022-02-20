@@ -23,7 +23,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.AuthService.Server.Hosting.Controllers.Roles;
 
 [ApiController]
-[Authorize("")]
+[Authorize("TODO")]
 [Route("v1/role")]
 public sealed class CreateRoleV1Controller: ControllerBase
 {

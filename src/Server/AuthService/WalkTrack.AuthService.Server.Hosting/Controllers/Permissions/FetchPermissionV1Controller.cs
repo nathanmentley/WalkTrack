@@ -23,7 +23,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.AuthService.Server.Hosting.Controllers.Permissions;
 
 [ApiController]
-[Authorize("")]
+[Authorize("TODO")]
 [Route("v1/permission/{id}")]
 public sealed class FetchPermissionV1Controller: ControllerBase
 {
