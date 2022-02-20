@@ -24,7 +24,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.EntryService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("TODO")]
+[Authorize("search-entry")]
 [Route("v1/entry")]
 public sealed class SearchEntryV1Controller: ControllerBase
 {

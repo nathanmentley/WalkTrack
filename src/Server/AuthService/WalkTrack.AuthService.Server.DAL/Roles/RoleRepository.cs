@@ -15,6 +15,8 @@
 */
 
 using Microsoft.Extensions.Options;
+using SqlKata;
+using SqlKata.Execution;
 using WalkTrack.AuthService.Common;
 using WalkTrack.AuthService.Server.Configuration;
 using WalkTrack.Framework.Server.DAL.Mssql;
@@ -40,6 +42,50 @@ internal sealed class RoleRepository: BaseRepository<Role, RolePresistedResource
     {
     }
 
+    public async Task<bool> DoesRoleHavePermission(
+        string roleId,
+        string permissionId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        IEnumerable<dynamic> records = await GetRolePermissionQuery()
+            .Where("RoleId", roleId)
+            .Where("PermissionId", permissionId)
+            .GetAsync();
+
+        return records.Any();
+    }
+
+    public async Task Link(string roleId, string permissionId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (!await DoesRoleHavePermission(roleId, permissionId, cancellationToken))
+        {
+            await GetRolePermissionQuery()
+                .InsertAsync(
+                    new Dictionary<string, object>()
+                    {
+                        { "Id", Guid.NewGuid().ToString() },
+                        { "RoleId", roleId },
+                        { "PermissionId", permissionId }
+                    }
+                );
+        }
+    }
+
+    public async Task Unlink(string roleId, string permissionId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await GetRolePermissionQuery()
+            .Where("RoleId", roleId)
+            .Where("PermissionId", permissionId)
+            .DeleteAsync();
+    }
+
     protected override RolePresistedResource ConvertToRecord(Role resource) =>
         new RolePresistedResource()
         {
@@ -53,4 +99,7 @@ internal sealed class RoleRepository: BaseRepository<Role, RolePresistedResource
             Id = record.Id.ToString(),
             Name = record.Name
         };
+
+    private Query GetRolePermissionQuery() =>
+        GetQueryFactory().Query("RolePermissions");
 }

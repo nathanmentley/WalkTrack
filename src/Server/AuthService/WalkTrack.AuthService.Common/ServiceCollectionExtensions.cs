@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
             .AddSingleton<ITranscoder, ResetPasswordRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, RoleCollectionJsonV1Transcoder>()
             .AddSingleton<ITranscoder, RoleJsonV1Transcoder>()
+            .AddSingleton<ITranscoder, RoleLinkRequestJsonV1Transcoder>()
             .AddSingleton<ITranscoder, TokenJsonV1Transcoder>()
             .AddSingleton<ITranscoder, UpdatePasswordRequestJsonV1Transcoder>();
 }

@@ -15,43 +15,42 @@
 */
 
 using Microsoft.AspNetCore.Mvc;
+using WalkTrack.AuthService.Common;
 using WalkTrack.Framework.Server.Authentications;
 using WalkTrack.Framework.Server.Hosting.Attributes;
 using WalkTrack.Framework.Server.Hosting.Exceptions;
-using WalkTrack.GoalService.Common;
 
-namespace WalkTrack.GoalService.Server.Hosting.Controllers;
+namespace WalkTrack.AuthService.Server.Hosting.Controllers.Roles;
 
 [ApiController]
-[Authorize("update-goal")]
-[Route("v1/goal")]
-public sealed class UpdateGoalV1Controller: ControllerBase
+[Authorize("link-role")]
+[Route("v1/role/_link")]
+public sealed class LinkRoleV1Controller: ControllerBase
 {
-    private readonly IGoalService _service;
+    private readonly IRoleService _service;
 
-    public UpdateGoalV1Controller(IGoalService service)
+    public LinkRoleV1Controller(IRoleService service)
     {
-        if (service is null)
-        {
+        _service = service ??
             throw new ArgumentNullException(nameof(service));
-        }
-
-        _service = service;
     }
 
-    [HttpPut]
-    public async Task<IActionResult> Create([FromBody] Goal goal, CancellationToken cancellationToken)
+    [HttpPost]
+    public async Task<IActionResult> Link(
+        [FromBody] RoleLinkRequest request,
+        CancellationToken cancellationToken
+    )
     {
-        if (goal is null)
-        {
-            throw new MissingBodyException($"{nameof(goal)} is required for {nameof(Create)}.");
-        }
-
         cancellationToken.ThrowIfCancellationRequested();
 
-        await _service.Update(GetAuthenticationContext(), goal, cancellationToken);
+        if (request is null)
+        {
+            throw new MissingBodyException();
+        }
 
-        return new NoContentResult();
+        await _service.Link(GetAuthenticationContext(), request, cancellationToken);
+
+        return NoContent();
     }
 
     private AuthenticationContext GetAuthenticationContext() =>

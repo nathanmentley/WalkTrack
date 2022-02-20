@@ -42,12 +42,9 @@ internal sealed class PermissionService: IPermissionService
     )
     {
         IEnumerable<Permission> permissions = await _repository.Search(
-            SetupCriteriaForAuthenticationContext(
-                authenticationContext,
-                new ICriterion[] {
-                    new IdCriterion(id)
-                }
-            ),
+            new ICriterion[] {
+                new IdCriterion(id)
+            },
             cancellationToken
         );
 
@@ -67,7 +64,7 @@ internal sealed class PermissionService: IPermissionService
         CancellationToken cancellationToken = default
     ) =>
         _repository.Search(
-            SetupCriteriaForAuthenticationContext(authenticationContext, criteria),
+            criteria,
             cancellationToken
         );
 
@@ -98,12 +95,9 @@ internal sealed class PermissionService: IPermissionService
     )
     {
         IEnumerable<Permission> permissions = await _repository.Search(
-            SetupCriteriaForAuthenticationContext(
-                authenticationContext,
-                new ICriterion[] {
-                    new IdCriterion(id)
-                }
-            ),
+            new ICriterion[] {
+                new IdCriterion(id)
+            },
             cancellationToken
         );
 
@@ -111,24 +105,5 @@ internal sealed class PermissionService: IPermissionService
         {
             await _repository.Delete(id, cancellationToken);
         }
-    }
-
-    private static IEnumerable<ICriterion> SetupCriteriaForAuthenticationContext(
-        AuthenticationContext authenticationContext,
-        IEnumerable<ICriterion> criteria
-    )
-    {
-        if (authenticationContext is UserAuthenticationContext userAuthenticationContext)
-        {
-            List<ICriterion> newCriteria = new List<ICriterion>();
-
-            newCriteria.AddRange(criteria);
-
-            newCriteria.Add(new UserIdCriterion(userAuthenticationContext.UserId));
-
-            return newCriteria;
-        }
-
-        return criteria;
     }
 }

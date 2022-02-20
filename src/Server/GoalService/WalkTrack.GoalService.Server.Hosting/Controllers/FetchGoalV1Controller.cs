@@ -23,7 +23,7 @@ using WalkTrack.GoalService.Common;
 namespace WalkTrack.GoalService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("TODO")]
+[Authorize("fetch-goal")]
 [Route("v1/goal/{id}")]
 public sealed class FetchGoalV1Controller: ControllerBase
 {

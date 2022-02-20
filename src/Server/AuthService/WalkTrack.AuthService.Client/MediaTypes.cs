@@ -108,6 +108,14 @@ internal static class MediaTypes
             .WithVersion(1)
             .Build();
 
+    public static readonly WalkTrackMediaType RoleLinkRequest =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.RoleLinkRequest")
+            .WithVersion(1)
+            .Build();
+
     public static readonly WalkTrackMediaType Permission =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)

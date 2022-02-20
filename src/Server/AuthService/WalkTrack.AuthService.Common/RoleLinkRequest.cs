@@ -14,10 +14,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace WalkTrack.Utils.DataSeeder.Loaders;
+using System.Diagnostics.CodeAnalysis;
 
-public sealed class RolePermissionsDataLoader : IDataLoader
+namespace WalkTrack.AuthService.Common;
+
+/// <summary>
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed record RoleLinkRequest
 {
-    public Task Load(CancellationToken cancellationToken = default) =>
-        Task.CompletedTask;
+    /// <summary>
+    /// </summary>
+    public string RoleName { get; init; } = string.Empty;
+
+    /// <summary>
+    /// </summary>
+    public string PermissionName { get; init; } = string.Empty;
 }

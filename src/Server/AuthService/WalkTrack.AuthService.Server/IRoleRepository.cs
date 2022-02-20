@@ -21,4 +21,21 @@ namespace WalkTrack.AuthService.Server;
 
 public interface IRoleRepository: IResourceRepository<Role>
 {
+    Task<bool> DoesRoleHavePermission(
+        string roleId,
+        string permissionId,
+        CancellationToken cancellationToken = default
+    );
+
+    Task Link(
+        string roleId,
+        string permissionId,
+        CancellationToken cancellationToken = default
+    );
+
+    Task Unlink(
+        string roleId,
+        string permissionId,
+        CancellationToken cancellationToken = default
+    );
 }

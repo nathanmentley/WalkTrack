@@ -51,4 +51,16 @@ public interface IRoleService
         string id,
         CancellationToken cancellationToken = default
     );
+
+    Task Link(
+        AuthenticationContext authenticationContext,
+        RoleLinkRequest roleLinkRequest,
+        CancellationToken cancellationToken = default
+    );
+ 
+    Task Unlink(
+        AuthenticationContext authenticationContext,
+        RoleLinkRequest roleLinkRequest,
+        CancellationToken cancellationToken = default
+    );
 }

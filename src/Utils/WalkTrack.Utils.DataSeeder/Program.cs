@@ -54,8 +54,8 @@ public static class Program
             .WithServiceAuthentication(configuration)
 
             .AddSingleton<IDataLoader, RoleDataLoader>()
-            //.AddSingleton<IDataLoader, PermissionDataLoader>()
-            //.AddSingleton<IDataLoader, RolePermissionsDataLoader>()
+            .AddSingleton<IDataLoader, PermissionDataLoader>()
+            .AddSingleton<IDataLoader, RoleLinkDataLoader>()
             //.AddSingleton<IDataLoader, GoalDataLoader>()
 
             .AddSingleton<App>()

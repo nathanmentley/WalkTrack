@@ -127,6 +127,9 @@ public abstract class BaseRepository<TResource, TPersistedResource>: IResourceRe
     protected Query GetQuery() =>
         _database.Query(_tableName);
 
+    protected QueryFactory GetQueryFactory() =>
+        _database;
+
     public void Dispose() =>
         _database.Dispose();
 }

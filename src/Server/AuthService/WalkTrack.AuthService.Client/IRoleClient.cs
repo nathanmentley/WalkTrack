@@ -24,4 +24,6 @@ public interface IRoleClient
     Task<IEnumerable<Role>> Search(CancellationToken cancellationToken = default);
     Task<Role> Create(Role role, CancellationToken cancellationToken = default);
     Task Delete(string id, CancellationToken cancellationToken = default);
+    Task Link(RoleLinkRequest request, CancellationToken cancellationToken = default);
+    Task Unlink(RoleLinkRequest request, CancellationToken cancellationToken = default);
 }

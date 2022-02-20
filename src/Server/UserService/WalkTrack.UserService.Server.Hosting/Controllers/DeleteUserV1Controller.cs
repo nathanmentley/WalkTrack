@@ -22,7 +22,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("TODO")]
+[Authorize("delete-user")]
 [Route("v1/user/{id}")]
 public sealed class DeleteUserV1Controller: ControllerBase
 {

@@ -192,13 +192,18 @@ internal sealed class AuthenticationService : IAuthenticationService
                 string.Equals(claim.Type, "id", StringComparison.OrdinalIgnoreCase)
             );
 
-        if (idClaim is null)
+        Claim? roleClaim =
+            indentity.Claims.FirstOrDefault(claim =>
+                string.Equals(claim.Type, "roleId", StringComparison.OrdinalIgnoreCase)
+            );
+
+        if (idClaim is null || roleClaim is null)
         {
             throw new InvalidOperationException("Cannot process authentication because the token doesn't contain required claims.");
         }
 
         return Task.FromResult(
-            new Token() { Id = GenerateJwtToken(idClaim.Value) }
+            new Token() { Id = GenerateJwtToken(idClaim.Value, roleClaim.Value) }
         );
     }
 
@@ -297,7 +302,7 @@ internal sealed class AuthenticationService : IAuthenticationService
             {
                 Id = auth.Id,
                 Username = auth.Username,
-                Token = GenerateJwtToken(auth.Id)
+                Token = GenerateJwtToken(auth.Id, auth.RoleId)
             };
         }
 
@@ -321,7 +326,7 @@ internal sealed class AuthenticationService : IAuthenticationService
             )
         );
 
-    private string GenerateJwtToken(string authId) =>
+    private string GenerateJwtToken(string authId, string roleId) =>
         _tokenHandler.WriteToken(
             _tokenHandler.CreateToken(
                 new SecurityTokenDescriptor()
@@ -330,7 +335,8 @@ internal sealed class AuthenticationService : IAuthenticationService
                     Expires = DateTime.UtcNow.AddDays(7),
                     Subject = new ClaimsIdentity(
                         new[] {
-                            new Claim("id", authId)
+                            new Claim("id", authId),
+                            new Claim("roleId", roleId)
                         }
                     )
                 }

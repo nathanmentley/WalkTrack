@@ -17,12 +17,10 @@
 using Microsoft.AspNetCore.Mvc;
 using WalkTrack.Framework.Server.Hosting.Exceptions;
 using WalkTrack.AuthService.Common;
-using WalkTrack.Framework.Server.Hosting.Attributes;
 
 namespace WalkTrack.AuthService.Server.Hosting.Controllers.Authentications;
 
 [ApiController]
-[Authorize("TODO")]
 [Route("v1/token")]
 public sealed class RefreshTokenV1Controller
 {

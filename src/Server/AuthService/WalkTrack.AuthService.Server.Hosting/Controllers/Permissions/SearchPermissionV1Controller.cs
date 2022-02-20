@@ -24,7 +24,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.AuthService.Server.Hosting.Controllers.Permissions;
 
 [ApiController]
-[Authorize("TODO")]
+[Authorize("search-permission")]
 [Route("v1/permission")]
 public sealed class SearchPermissionV1Controller: ControllerBase
 {

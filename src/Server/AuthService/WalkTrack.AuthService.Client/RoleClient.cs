@@ -108,6 +108,46 @@ internal sealed class RoleClient: BaseClient, IRoleClient, IDisposable
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
 
+    public async Task Link(
+        RoleLinkRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(request)
+            .WithContentTypes(MediaTypes.RoleLinkRequest)
+            .WithMethod(HttpMethod.Post)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("role")
+                    .AppendPathSegment("_link")
+            )
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthenticator(_authenicator)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
+            .Send<RoleLinkRequest>(_httpClient, cancellationToken);
+
+    public async Task Unlink(
+        RoleLinkRequest request,
+        CancellationToken cancellationToken = default
+    ) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(request)
+            .WithContentTypes(MediaTypes.RoleLinkRequest)
+            .WithMethod(HttpMethod.Post)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("role")
+                    .AppendPathSegment("_unlink")
+            )
+            .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthenticator(_authenicator)
+            .WithErrorHandler(new ForbiddenErrorHandler())
+            .WithErrorHandler(new UnauthorizedErrorHandler())
+            .Send<RoleLinkRequest>(_httpClient, cancellationToken);
+
     public void Dispose() =>
         _httpClient.Dispose();
 }

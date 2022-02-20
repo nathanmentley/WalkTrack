@@ -23,16 +23,19 @@ namespace WalkTrack.AuthService.Server.Services.Roles;
 
 internal sealed class RoleService: IRoleService
 {
-    private readonly IRoleRepository _repository;
+    private readonly IRoleRepository _roleRepository;
+    private readonly IPermissionRepository _permissionRepository;
 
-    public RoleService(IRoleRepository repository)
+    public RoleService(
+        IRoleRepository roleRepository,
+        IPermissionRepository permissionRepository
+    )
     {
-        if (repository is null)
-        {
-            throw new ArgumentNullException(nameof(repository));
-        }
+        _roleRepository = roleRepository ??
+            throw new ArgumentNullException(nameof(roleRepository));
 
-        _repository = repository;
+        _permissionRepository = permissionRepository ??
+            throw new ArgumentNullException(nameof(permissionRepository));
     }
  
     public async Task<Role> Fetch(
@@ -41,13 +44,10 @@ internal sealed class RoleService: IRoleService
         CancellationToken cancellationToken = default
     )
     {
-        IEnumerable<Role> roles = await _repository.Search(
-            SetupCriteriaForAuthenticationContext(
-                authenticationContext,
-                new ICriterion[] {
-                    new IdCriterion(id)
-                }
-            ),
+        IEnumerable<Role> roles = await _roleRepository.Search(
+            new ICriterion[] {
+                new IdCriterion(id)
+            },
             cancellationToken
         );
 
@@ -66,8 +66,8 @@ internal sealed class RoleService: IRoleService
         IEnumerable<ICriterion> criteria,
         CancellationToken cancellationToken = default
     ) =>
-        _repository.Search(
-            SetupCriteriaForAuthenticationContext(authenticationContext, criteria),
+        _roleRepository.Search(
+            criteria,
             cancellationToken
         );
 
@@ -76,7 +76,7 @@ internal sealed class RoleService: IRoleService
         Role resource,
         CancellationToken cancellationToken = default
     ) =>
-        _repository.Create(
+        _roleRepository.Create(
             resource with { Id = Guid.NewGuid().ToString() },
             cancellationToken
         );
@@ -86,7 +86,7 @@ internal sealed class RoleService: IRoleService
         Role resource,
         CancellationToken cancellationToken = default
     ) =>
-        _repository.Update(
+        _roleRepository.Update(
             resource,
             cancellationToken
         );
@@ -97,38 +97,96 @@ internal sealed class RoleService: IRoleService
         CancellationToken cancellationToken = default
     )
     {
-        IEnumerable<Role> roles = await _repository.Search(
-            SetupCriteriaForAuthenticationContext(
-                authenticationContext,
-                new ICriterion[] {
-                    new IdCriterion(id)
-                }
-            ),
+        IEnumerable<Role> roles = await _roleRepository.Search(
+            new ICriterion[] {
+                new IdCriterion(id)
+            },
             cancellationToken
         );
 
         if (roles.Any())
         {
-            await _repository.Delete(id, cancellationToken);
+            await _roleRepository.Delete(id, cancellationToken);
         }
     }
 
-    private static IEnumerable<ICriterion> SetupCriteriaForAuthenticationContext(
+    public async Task Link(
         AuthenticationContext authenticationContext,
-        IEnumerable<ICriterion> criteria
+        RoleLinkRequest roleLinkRequest,
+        CancellationToken cancellationToken = default
+    ) =>
+        await _roleRepository.Link(
+            await GetRoleId(
+                roleLinkRequest.RoleName,
+                cancellationToken
+            ),
+            await GetPermissionId(
+                roleLinkRequest.PermissionName,
+                cancellationToken
+            ),
+            cancellationToken
+        );
+ 
+    public async Task Unlink(
+        AuthenticationContext authenticationContext,
+        RoleLinkRequest roleLinkRequest,
+        CancellationToken cancellationToken = default
+    ) =>
+        await _roleRepository.Unlink(
+            await GetRoleId(
+                roleLinkRequest.RoleName,
+                cancellationToken
+            ),
+            await GetPermissionId(
+                roleLinkRequest.PermissionName,
+                cancellationToken
+            ),
+            cancellationToken
+        );
+
+    private async Task<string> GetRoleId(
+        string roleName,
+        CancellationToken cancellationToken
     )
     {
-        if (authenticationContext is UserAuthenticationContext userAuthenticationContext)
+        IEnumerable<Role> roles =
+            await _roleRepository.Search(
+                Enumerable.Empty<ICriterion>(),
+                cancellationToken
+            );
+        
+        Role? role = roles.FirstOrDefault(
+            role => string.Equals(roleName, role.Name)
+        );
+
+        if (role is not null)
         {
-            List<ICriterion> newCriteria = new List<ICriterion>();
-
-            newCriteria.AddRange(criteria);
-
-            newCriteria.Add(new UserIdCriterion(userAuthenticationContext.UserId));
-
-            return newCriteria;
+            return role.Id;
         }
 
-        return criteria;
+        throw new InvalidRequestException($"Role {roleName} does not exist.");
+    }
+
+    private async Task<string> GetPermissionId(
+        string permissionName,
+        CancellationToken cancellationToken
+    )
+    {
+        IEnumerable<Permission> permissions =
+            await _permissionRepository.Search(
+                Enumerable.Empty<ICriterion>(),
+                cancellationToken
+            );
+        
+        Permission? permission = permissions.FirstOrDefault(
+            permission => string.Equals(permissionName, permission.Name)
+        );
+
+        if (permission is not null)
+        {
+            return permission.Id;
+        }
+
+        throw new InvalidRequestException($"Permission {permissionName} does not exist.");
     }
 }
