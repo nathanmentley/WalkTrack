@@ -44,6 +44,14 @@ internal sealed class UserClient: BaseClient, IUserClient, IDisposable
             .WithVersion(1)
             .Build();
 
+    private static readonly WalkTrackMediaType _forgotPasswordMediaType =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.ForgotPassword")
+            .WithVersion(1)
+            .Build();
+
     private static readonly WalkTrackMediaType _createUserMediaType =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
@@ -148,6 +156,20 @@ internal sealed class UserClient: BaseClient, IUserClient, IDisposable
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send(_httpClient, cancellationToken);
+
+    public async Task ForgotPassword(ForgotPassword forgotPassword, CancellationToken cancellationToken = default) =>
+        await new RequestBuilder(_transcoder)
+            .WithBody(forgotPassword)
+            .WithContentTypes(_forgotPasswordMediaType)
+            .WithMethod(HttpMethod.Post)
+            .WithUrl(
+                new Url()
+                    .AppendPathSegment("v1")
+                    .AppendPathSegment("user")
+                    .AppendPathSegment("_forgotPassword")
+            )
+            .WithAcceptType(MediaTypes.ApiError)
+            .Send<ForgotPassword>(_httpClient, cancellationToken);
 
     public void Dispose() =>
         _httpClient.Dispose();

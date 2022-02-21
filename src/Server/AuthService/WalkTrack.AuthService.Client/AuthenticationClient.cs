@@ -85,7 +85,7 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, I
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Token, Token>(_httpClient, cancellationToken);
 
-    public async Task RequestForgottenPassword(
+    public async Task<ForgotPasswordResponse> RequestForgottenPassword(
         ForgotPasswordRequest request,
         CancellationToken cancellationToken = default
     ) =>
@@ -99,10 +99,12 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, I
                     .AppendPathSegment("password")
                     .AppendPathSegment("forgot")
             )
+            .WithAcceptType(MediaTypes.ForgotPasswordResponse)
             .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
-            .Fetch<ForgotPasswordRequest>(_httpClient, cancellationToken);
+            .Fetch<ForgotPasswordRequest, ForgotPasswordResponse>(_httpClient, cancellationToken);
 
     public async Task<AuthenticateResponse> ResetPassword(
         ResetPasswordRequest request,

@@ -17,6 +17,8 @@
 using FluentMigrator.Runner;
 using WalkTrack.AuthService.Client;
 using WalkTrack.AuthService.Common;
+using WalkTrack.EmailService.Client;
+using WalkTrack.EmailService.Common;
 using WalkTrack.Framework.Server.Hosting;
 using WalkTrack.UserService.Common;
 using WalkTrack.UserService.Server.Configuration;
@@ -65,6 +67,13 @@ public static class Program
             .WithUserTranscoders()
             .WithUserDAL()
             .WithUserServices(configuration)
+
+            .WithEmailTranscoders()
+            .WithEmailClient(
+                configuration
+                    .GetSection("EmailServiceSettings")
+                    .GetValue<string>("Url")
+            )
 
             .WithAuthTranscoders()
             .WithAuthClient(

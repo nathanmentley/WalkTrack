@@ -29,4 +29,6 @@ public interface IUserClient
     Task Update(User user, CancellationToken cancellationToken = default);
 
     Task Delete(string id, CancellationToken cancellationToken = default);
+
+    Task ForgotPassword(ForgotPassword forgotPassword, CancellationToken cancellationToken = default);
 }

@@ -76,6 +76,14 @@ internal static class MediaTypes
             .WithVersion(1)
             .Build();
 
+    public static readonly WalkTrackMediaType ForgotPasswordResponse =
+        new WalkTrackMediaTypeBuilder()
+            .WithType(WalkTrackMediaTypeTypes.Application)
+            .WithSubType(WalkTrackMediaTypeSubTypes.Json)
+            .WithStructure("WalkTrack.ForgotPasswordResponse")
+            .WithVersion(1)
+            .Build();
+
     public static readonly WalkTrackMediaType ForgotPasswordRequest =
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)

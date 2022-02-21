@@ -239,7 +239,7 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     /// <summary>
     /// </summary>
-    public async Task RequestForgottenPassword(
+    public async Task<ForgotPasswordResponse> RequestForgottenPassword(
         ForgotPasswordRequest request,
         CancellationToken cancellationToken = default
     )
@@ -256,7 +256,7 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         if (auth is null)
         {
-            return;
+            throw new InvalidRequestException($"Username {request.Username} could not be found.");
         }
 
         auth = auth with {
@@ -266,30 +266,12 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         auth = await _repository.Update(auth, cancellationToken);
 
-        //await SendForgotPasswordEmail(auth, request, cancellationToken);
+        return new ForgotPasswordResponse()
+        {
+            Token = auth.ResetToken
+        };
     }
-/*
-        private async Task SendForgotPasswordEmail(
-            Auth auth,
-            ForgotPasswordRequest request,
-            CancellationToken cancellationToken
-        ) =>
-            await _emailClient.Send(
-                new [] {
-                    new Email()
-                    {
-                        To = auth.Username,
-                        ToAddress = request.Email,
-                        From = "WalkTrack",
-                        FromAddress = "noreply@Walktrack.PokeTriRx.com",
-                        Subject = "Password Reset Request",
-                        HtmlMessage = $"Token: {auth.ResetToken}",
-                        TextMessage = $"Token: {auth.ResetToken}"
-                    }
-                },
-                cancellationToken
-            );
-*/
+
     /// <summary>
     /// </summary>
     public async Task<AuthenticateResponse> ResetPassword(

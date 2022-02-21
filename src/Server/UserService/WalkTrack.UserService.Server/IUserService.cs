@@ -50,4 +50,9 @@ public interface IUserService
         string id,
         CancellationToken cancellationToken = default
     );
+
+    Task ForgotPassword(
+        ForgotPassword request,
+        CancellationToken cancellationToken = default
+    );
 }

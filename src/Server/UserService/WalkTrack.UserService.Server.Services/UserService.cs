@@ -16,6 +16,8 @@
 
 using WalkTrack.AuthService.Client;
 using WalkTrack.AuthService.Common;
+using WalkTrack.EmailService.Client;
+using WalkTrack.EmailService.Common;
 using WalkTrack.Framework.Common.Criteria;
 using WalkTrack.Framework.Server.Authentications;
 using WalkTrack.Framework.Server.Exceptions;
@@ -27,16 +29,20 @@ namespace WalkTrack.UserService.Server.Services;
 internal sealed class UserService: IUserService
 {
     private readonly IAuthenticationClient _authenticationClient;
+    private readonly IEmailClient _emailClient;
     private readonly IUserRepository _repository;
 
     public UserService(
         IAuthenticationClient authenticationClient,
-        IRoleClient roleClient,
+        IEmailClient emailClient,
         IUserRepository repository
     )
     {
         _authenticationClient = authenticationClient ??
             throw new ArgumentNullException(nameof(authenticationClient));
+
+        _emailClient = emailClient ??
+            throw new ArgumentNullException(nameof(emailClient));
 
         _repository = repository ??
             throw new ArgumentNullException(nameof(repository));
@@ -146,7 +152,52 @@ internal sealed class UserService: IUserService
         await _repository.Delete(user.Id, cancellationToken);
     }
 
-    public async Task<User> FetchRecordWithAuth(
+    public async Task ForgotPassword(
+        ForgotPassword request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        IEnumerable<User> users =
+            await _repository.Search(
+                new [] {
+                    new EmailCriterion(request.Email)
+                },
+                cancellationToken
+            );
+
+        User? user = users.FirstOrDefault();
+
+        if (user is not null)
+        {
+            ForgotPasswordResponse response =
+                await _authenticationClient.RequestForgottenPassword(
+                    new ForgotPasswordRequest()
+                    {
+                        Username = user.Username
+                    },
+                    cancellationToken
+                );
+
+            await _emailClient.Send(
+                new []
+                {
+                    new Email()
+                    {
+                        From = "WalkTrack",
+                        FromAddress = "walktrack@poketrirx.com",
+                        To = request.Email,
+                        ToAddress = request.Email,
+                        Subject = "forgot password",
+                        HtmlMessage = response.Token,
+                        TextMessage = response.Token
+                    }
+                },
+                cancellationToken
+            );
+        }
+    }
+
+    private async Task<User> FetchRecordWithAuth(
         AuthenticationContext authenticationContext,
         string id,
         CancellationToken cancellationToken = default

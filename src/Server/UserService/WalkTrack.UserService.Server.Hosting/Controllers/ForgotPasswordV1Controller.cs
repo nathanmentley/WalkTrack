@@ -15,38 +15,42 @@
 */
 
 using Microsoft.AspNetCore.Mvc;
-using WalkTrack.AuthService.Common;
-using WalkTrack.Framework.Server.Hosting.Attributes;
 using WalkTrack.Framework.Server.Hosting.Exceptions;
+using WalkTrack.UserService.Common;
 
-namespace WalkTrack.AuthService.Server.Hosting.Controllers.Authentications;
+namespace WalkTrack.UserService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("forgoet-password")]
-[Route("v1/password/forgot")]
-public sealed class RequestForgottenPasswordV1Controller
+[Route("v1/user/_forgotPassword")]
+public sealed class ForgotPasswordV1Controller: ControllerBase
 {
-    private readonly IAuthenticationService _service;
+    private readonly IUserService _service;
 
-    public RequestForgottenPasswordV1Controller(IAuthenticationService service)
+    public ForgotPasswordV1Controller(IUserService service)
     {
-        _service = service ??
+        if (service is null)
+        {
             throw new ArgumentNullException(nameof(service));
+        }
+
+        _service = service;
     }
 
     [HttpPost]
-    public async Task<ForgotPasswordResponse> ForgottenPassword(
-        [FromBody] ForgotPasswordRequest request,
-        CancellationToken cancellationToken
+    public async Task<IActionResult> ForgotPassword(
+        [FromBody] ForgotPassword request,
+        CancellationToken cancellationToken = default
     )
     {
-        if (request is null)
-        {
-            throw new MissingBodyException($"{nameof(request)} is required for {nameof(ForgottenPassword)}.");
-        }
-
         cancellationToken.ThrowIfCancellationRequested();
 
-        return await _service.RequestForgottenPassword(request, cancellationToken);
+        if (request is null)
+        {
+            throw new MissingBodyException();
+        }
+
+        await _service.ForgotPassword(request, cancellationToken);
+
+        return NoContent();
     }
 }

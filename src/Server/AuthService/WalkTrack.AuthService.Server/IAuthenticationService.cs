@@ -37,7 +37,7 @@ public interface IAuthenticationService
         CancellationToken cancellationToken = default
     );
 
-    Task RequestForgottenPassword(
+    Task<ForgotPasswordResponse> RequestForgottenPassword(
         ForgotPasswordRequest request,
         CancellationToken cancellationToken = default
     );

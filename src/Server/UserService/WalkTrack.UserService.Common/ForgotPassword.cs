@@ -14,17 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-namespace WalkTrack.App.Pages.Models;
+using System.Diagnostics.CodeAnalysis;
 
-public sealed class ForgotPasswordModel
+namespace WalkTrack.UserService.Common;
+
+/// <summary>
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed record ForgotPassword
 {
-    public string Email { get; set; } = string.Empty;
-
-    public bool Loading { get; set; } = false;
-
-    public UserService.Common.ForgotPassword ToForgotPassword() =>
-        new UserService.Common.ForgotPassword()
-        {
-            Email = Email
-        };
+    /// <summary>
+    /// </summary>
+    public string Email { get; init; } = string.Empty;
 }
