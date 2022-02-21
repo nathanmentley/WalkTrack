@@ -39,20 +39,4 @@ public sealed record User: IResource
     /// <summary>
     /// </summary>
     public bool IsPublic { get; init; } = false;
-
-    /// <summary>
-    /// </summary>
-    public string Password { get; init; } = string.Empty;
-
-    /// <summary>
-    /// </summary>
-    public string Salt { get; init; } = string.Empty;
-
-    /// <summary>
-    /// </summary>
-    public string ResetToken { get; init; } = string.Empty;
-
-    /// <summary>
-    /// </summary>
-    public DateTime ResetTokenExpiresAt { get; init; } = DateTime.MinValue;
 }

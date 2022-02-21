@@ -18,13 +18,7 @@ using WalkTrack.AuthService.Common;
 
 namespace WalkTrack.AuthService.Client;
 
-public interface IAuthenticationClient
+public interface ILoginClient
 {
-    Task Create(CreateAuthRequest request, CancellationToken cancellationToken = default);
-
-    Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default);
-
-    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
-
-    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+    Task<AuthenticateResponse> Login(AuthenticateRequest request, CancellationToken cancellationToken = default);
 }

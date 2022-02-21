@@ -36,6 +36,7 @@ internal sealed class AuthenticationService : IAuthenticationService
     private readonly string _adminUsername;
     private readonly string _adminPassword;
     private readonly IAuthenticationRepository _repository;
+    private readonly IRoleRepository _roleRepository;
     private readonly IHashingUtility _hashingUtility;
     private readonly JwtSecurityTokenHandler _tokenHandler;
     private readonly SigningCredentials _signingCredentials;
@@ -45,6 +46,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         IOptions<AdminSettings> adminSettings,
         IOptions<AuthenticationSettings> authenticationSettings,
         IAuthenticationRepository repository,
+        IRoleRepository roleRepository,
         IHashingUtility hashingUtility
     )
     {
@@ -63,6 +65,11 @@ internal sealed class AuthenticationService : IAuthenticationService
             throw new ArgumentNullException(nameof(repository));
         }
 
+        if (roleRepository is null)
+        {
+            throw new ArgumentNullException(nameof(roleRepository));
+        }
+
         if (hashingUtility is null)
         {
             throw new ArgumentNullException(nameof(hashingUtility));
@@ -73,6 +80,8 @@ internal sealed class AuthenticationService : IAuthenticationService
         _adminPassword = adminSettings.Value.AdminPassword;
 
         _repository = repository;
+
+        _roleRepository = roleRepository;
 
         _hashingUtility = hashingUtility;
 
@@ -110,7 +119,14 @@ internal sealed class AuthenticationService : IAuthenticationService
                 .Any()
         )
         {
-            throw new InvalidRequestException("Email already exists");
+            throw new InvalidRequestException("Authentication already exists");
+        }
+
+        string? roleId = await GetRoleId(resource.RoleName, cancellationToken);
+
+        if (roleId is null)
+        {
+            throw new InvalidRequestException($"Role {resource.RoleName} does not exist.");
         }
 
         string salt = Guid.NewGuid().ToString();
@@ -120,11 +136,25 @@ internal sealed class AuthenticationService : IAuthenticationService
                 Id = Guid.NewGuid().ToString(),
                 Salt = salt,
                 Username = resource.Username,
-                RoleId = resource.RoleId,
+                RoleId = roleId,
                 Password = _hashingUtility.Hash(resource.Password, salt)
             },
             cancellationToken
         );
+    }
+
+    private async Task<string?> GetRoleId(string roleName, CancellationToken cancellationToken)
+    {
+        IEnumerable<Role> roles =
+            await _roleRepository.Search(Enumerable.Empty<ICriterion>(), cancellationToken);
+
+        Role? role = roles.FirstOrDefault(
+            role => string.Equals(role.Name, roleName)
+        );
+
+        return role is not null ?
+            role.Id:
+            null;
     }
 
     /// <summary>

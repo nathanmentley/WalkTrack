@@ -49,19 +49,8 @@ public sealed class CreateUserV1Controller: ControllerBase
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        User user = FromCreateUserRequest(createUserRequest);
-
-        User createdUser = await _service.Create(user, cancellationToken);
+        User createdUser = await _service.Create(createUserRequest, cancellationToken);
 
         return new ObjectResult(createdUser) { StatusCode = StatusCodes.Status201Created };
     }
-
-    private static User FromCreateUserRequest(CreateUserRequest createUserRequest) =>
-        new User()
-        {
-            Username = createUserRequest.Username,
-            Email = createUserRequest.Email,
-            IsPublic = createUserRequest.IsPublic,
-            Password = createUserRequest.Password
-        };
 }

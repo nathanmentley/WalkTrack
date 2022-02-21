@@ -25,16 +25,16 @@ public sealed class AppAuthenticator : IAuthenticator
 {
     private static readonly string TokenKey = "token";
 
-    private readonly IAuthenticationClient _authenticationClient;
+    private readonly ILoginClient _loginClient;
 
     private string _token = string.Empty;
 
     public AppAuthenticator(
-        IAuthenticationClient authenticationClient
+        ILoginClient loginClient
     )
     {
-        _authenticationClient = authenticationClient ??
-            throw new ArgumentNullException(nameof(authenticationClient));
+        _loginClient = loginClient ??
+            throw new ArgumentNullException(nameof(loginClient));
     }
 
     public Task<string> GetToken(CancellationToken cancellationToken = default) =>
@@ -67,7 +67,7 @@ public sealed class AppAuthenticator : IAuthenticator
         CancellationToken cancellationToken = default
     )
     {
-        AuthenticateResponse response = await _authenticationClient.Login(request, cancellationToken);
+        AuthenticateResponse response = await _loginClient.Login(request, cancellationToken);
 
         _token = response.Token;
 

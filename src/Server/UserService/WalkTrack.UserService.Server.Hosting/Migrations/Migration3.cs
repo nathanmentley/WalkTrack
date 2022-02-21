@@ -14,17 +14,33 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using WalkTrack.AuthService.Common;
+using FluentMigrator;
 
-namespace WalkTrack.AuthService.Client;
+namespace WalkTrack.UserService.Server.Hosting.Migrations;
 
-public interface IAuthenticationClient
+[Migration(3)]
+public class Migration3: Migration
 {
-    Task Create(CreateAuthRequest request, CancellationToken cancellationToken = default);
+    public override void Up()
+    {
+        Delete
+            .Column("Password")
+            .FromTable("Users");
 
-    Task<Token> RefreshToken(Token request, CancellationToken cancellationToken = default);
+        Delete
+            .Column("Salt")
+            .FromTable("Users");
 
-    Task RequestForgottenPassword(ForgotPasswordRequest request, CancellationToken cancellationToken = default);
+        Delete
+            .Column("ResetToken")
+            .FromTable("Users");
 
-    Task<AuthenticateResponse> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken = default);
+        Delete
+            .Column("ResetTokenExpiresAt")
+            .FromTable("Users");
+    }
+
+    public override void Down()
+    {
+    }
 }

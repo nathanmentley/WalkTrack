@@ -33,5 +33,5 @@ public sealed record CreateAuthRequest
 
     /// <summary>
     /// </summary>
-    public string RoleId { get; init; } = string.Empty;
+    public string RoleName { get; init; } = string.Empty;
 }

@@ -27,7 +27,6 @@ namespace WalkTrack.UserService.Server.Services;
 internal sealed class UserService: IUserService
 {
     private readonly IAuthenticationClient _authenticationClient;
-    private IRoleClient _roleClient;
     private readonly IUserRepository _repository;
 
     public UserService(
@@ -38,9 +37,6 @@ internal sealed class UserService: IUserService
     {
         _authenticationClient = authenticationClient ??
             throw new ArgumentNullException(nameof(authenticationClient));
-
-        _roleClient = roleClient ??
-            throw new ArgumentNullException(nameof(roleClient));
 
         _repository = repository ??
             throw new ArgumentNullException(nameof(repository));
@@ -68,7 +64,7 @@ internal sealed class UserService: IUserService
     }
 
     public async Task<User> Create(
-        User resource,
+        CreateUserRequest resource,
         CancellationToken cancellationToken = default
     )
     {
@@ -105,33 +101,21 @@ internal sealed class UserService: IUserService
             {
                 Username = resource.Username,
                 Password = resource.Password,
-                RoleId = await GetRoleId(cancellationToken)
+                RoleName = "user"
             },
             cancellationToken
         );
 
         return await _repository.Create(
-            resource with {
-                Id = Guid.NewGuid().ToString()
+            new User()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Username = resource.Username,
+                Email = resource.Email,
+                IsPublic = resource.IsPublic,
             },
             cancellationToken
         );
-    }
-
-    private async Task<string> GetRoleId(CancellationToken cancellationToken)
-    {
-        IEnumerable<Role> roles = await _roleClient.Search(cancellationToken);
-
-        Role? userRole = roles.FirstOrDefault(role => string.Equals(role.Name, "user"));
-
-        if (userRole is not null)
-        {
-            return userRole.Id;
-        }
-        else
-        {
-            throw new Exception("TODO");
-        }
     }
 
     public async Task<User> Update(

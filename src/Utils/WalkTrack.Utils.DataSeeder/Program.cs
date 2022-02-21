@@ -31,10 +31,14 @@ namespace WalkTrack.Utils.DataSeeder;
 
 public static class Program
 {
-    public static async Task Main(string[] args) =>
+    public static async Task Main(string[] args)
+    {
+        using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
         await GetServices(GetConfiguration())
             .GetRequiredService<App>()
-            .Run();
+            .Run(cancellationTokenSource.Token);
+    }
 
     private static IServiceProvider GetServices(
         IConfiguration configuration
@@ -56,7 +60,8 @@ public static class Program
             .AddSingleton<IDataLoader, RoleDataLoader>()
             .AddSingleton<IDataLoader, PermissionDataLoader>()
             .AddSingleton<IDataLoader, RoleLinkDataLoader>()
-            //.AddSingleton<IDataLoader, GoalDataLoader>()
+            .AddSingleton<IDataLoader, AuthenticationDataLoader>()
+            .AddSingleton<IDataLoader, GoalDataLoader>()
 
             .AddSingleton<App>()
 

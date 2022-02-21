@@ -35,7 +35,7 @@ public interface IUserService
     );
 
     Task<User> Create(
-        User resource,
+        CreateUserRequest resource,
         CancellationToken cancellationToken = default
     );
 

@@ -23,7 +23,7 @@ using WalkTrack.AuthService.Common;
 namespace WalkTrack.AuthService.Server.Hosting.Controllers;
 
 [ApiController]
-[Authorize("TODO")]
+[Authorize("update-password")]
 [Route("v1/user/{userId}/_updatePassword")]
 public sealed class UpdateUserPasswordV1Controller: ControllerBase
 {

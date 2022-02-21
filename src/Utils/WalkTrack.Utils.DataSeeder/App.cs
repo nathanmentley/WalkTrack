@@ -28,11 +28,11 @@ public class App
             throw new ArgumentNullException(nameof(dataLoaders));
     }
 
-    public async Task Run()
+    public async Task Run(CancellationToken cancellationToken)
     {
         foreach(IDataLoader dataLoader in _dataLoaders)
         {
-            await dataLoader.Load();
+            await dataLoader.Load(cancellationToken);
         }
     }
 }

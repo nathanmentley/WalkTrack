@@ -24,20 +24,20 @@ namespace WalkTrack.AuthService.Client;
 internal sealed class ServiceAuthenticator : IAuthenticator
 {
     private readonly ServiceAuthenticatorSettings _configuration;
-    private readonly IAuthenticationClient _authenticationClient;
+    private readonly ILoginClient _loginClient;
 
     private AuthenticateResponse? _cachedResponse = null;
 
     public ServiceAuthenticator(
         IOptions<ServiceAuthenticatorSettings> configuration,
-        IAuthenticationClient authenticationClient
+        ILoginClient loginClient
     )
     {
         _configuration = configuration.Value ??
             throw new ArgumentNullException(nameof(configuration));
 
-        _authenticationClient = authenticationClient ??
-            throw new ArgumentNullException(nameof(authenticationClient));
+        _loginClient = loginClient ??
+            throw new ArgumentNullException(nameof(loginClient));
     }
 
     public async Task<string> GetToken(CancellationToken cancellationToken = default)
@@ -53,7 +53,7 @@ internal sealed class ServiceAuthenticator : IAuthenticator
 
     private async Task Login(CancellationToken cancellationToken = default)
     {
-        _cachedResponse = await _authenticationClient.Login(
+        _cachedResponse = await _loginClient.Login(
             new AuthenticateRequest()
             {
                 Username = _configuration.Username,

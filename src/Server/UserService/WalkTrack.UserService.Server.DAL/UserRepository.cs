@@ -48,11 +48,7 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
             Id = Guid.Parse(resource.Id),
             Username = resource.Username,
             Email = resource.Email,
-            IsPublic = resource.IsPublic,
-            Password = resource.Password,
-            Salt = resource.Salt,
-            ResetToken = resource.ResetToken,
-            ResetTokenExpiresAt = resource.ResetTokenExpiresAt
+            IsPublic = resource.IsPublic
         };
 
     protected override User FromRecord(UserPresistedResource record) =>
@@ -61,10 +57,6 @@ internal sealed class UserRepository: BaseRepository<User, UserPresistedResource
             Id = record.Id.ToString(),
             Username = record.Username,
             Email = record.Email,
-            IsPublic = record.IsPublic,
-            Password = record.Password,
-            Salt = record.Salt,
-            ResetToken = record.ResetToken,
-            ResetTokenExpiresAt = record.ResetTokenExpiresAt
+            IsPublic = record.IsPublic
         };
 }

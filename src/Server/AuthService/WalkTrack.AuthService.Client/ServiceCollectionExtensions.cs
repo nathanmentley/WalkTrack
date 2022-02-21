@@ -16,6 +16,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using WalkTrack.Framework.Client.Authentications;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.Framework.Server.Authorizations;
@@ -34,11 +35,18 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IAuthenticationClient>(
                 sp => new AuthenticationClient(
                     authUrl,
+                    sp.GetRequiredService<IAuthenticator>(),
                     sp.GetRequiredService<ITranscoderProcessor>()
                 )
             )
             .AddSingleton<IAuthorizationClient>(
                 sp => new AuthorizationClient(
+                    authUrl,
+                    sp.GetRequiredService<ITranscoderProcessor>()
+                )
+            )
+            .AddSingleton<ILoginClient>(
+                sp => new LoginClient(
                     authUrl,
                     sp.GetRequiredService<ITranscoderProcessor>()
                 )
@@ -65,15 +73,18 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration
     ) =>
         collection
-            .AddSingleton<IAuthorizationClient>(
-                sp => new AuthorizationClient(
-                    configuration
-                        .GetSection("ServiceAuthorizationSettings")
-                        .GetValue<string>("AuthAddress"),
-                    sp.GetRequiredService<ITranscoderProcessor>()
-                )
-            )
-            .AddSingleton<IAuthorizer, ServiceAuthorizer>();
+            .AddSingleton<IAuthorizer>(
+                sp =>
+                    new ServiceAuthorizer(
+
+                        new AuthorizationClient(
+                            configuration
+                                .GetSection("ServiceAuthorizationSettings")
+                                .GetValue<string>("AuthAddress"),
+                            sp.GetRequiredService<ITranscoderProcessor>()
+                        )
+                    )
+            );
 
     /// <summary>
     /// </summary>
@@ -82,13 +93,16 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration
     ) =>
         collection
-            .AddSingleton<IAuthenticationClient>(
-                sp => new AuthenticationClient(
-                    configuration
-                        .GetSection("ServiceAuthenticatorSettings")
-                        .GetValue<string>("AuthAddress"),
-                    sp.GetRequiredService<ITranscoderProcessor>()
-                )
-            )
-            .AddSingleton<IAuthenticator, ServiceAuthenticator>();
+            .AddSingleton<IAuthenticator>(
+                sp =>
+                    new ServiceAuthenticator(
+                        sp.GetRequiredService<IOptions<ServiceAuthenticatorSettings>>(),
+                        new LoginClient(
+                            configuration
+                                .GetSection("ServiceAuthenticatorSettings")
+                                .GetValue<string>("AuthAddress"),
+                            sp.GetRequiredService<ITranscoderProcessor>()
+                        )
+                    )
+            );
 }

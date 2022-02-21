@@ -45,19 +45,31 @@ public sealed class GoalDataLoader: BaseDataLoader<Goal>
             throw new ArgumentNullException(nameof(goalClient));
     }
 
-    protected override Task LoadRecord(
+    protected override async Task LoadRecord(
         Goal record,
         CancellationToken cancellationToken = default
     )
     {
-        return Task.CompletedTask;
-        /*
-        IEnumerable<Goal> goals = await _goalClient.Search(cancellationToken);
+        IEnumerable<Goal> goals =
+            await _goalClient.Search(cancellationToken);
 
-        if (!goals.Any(goal => string.Equals(record.Name, goal.Name)))
+        Goal? existing =
+            goals.FirstOrDefault(
+                goal =>
+                    string.Equals(record.Name, goal.Name) &&
+                    string.IsNullOrWhiteSpace(record.UserId)
+            );
+
+        if (existing is null)
         {
             await _goalClient.Create(record, cancellationToken);
         }
-        */
+        else
+        {
+            await _goalClient.Update(
+                record with { Id = existing.Id },
+                cancellationToken
+            );
+        }
     }
 }

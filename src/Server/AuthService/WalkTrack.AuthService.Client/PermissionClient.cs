@@ -30,11 +30,11 @@ internal sealed class PermissionClient: BaseClient, IPermissionClient, IDisposab
 
     public PermissionClient(string url, IAuthenticator authenicator, ITranscoderProcessor transcoder)
     {
-        _transcoder = transcoder ??
-            throw new ArgumentNullException(nameof(transcoder));
-
         _authenicator = authenicator ??
             throw new ArgumentNullException(nameof(authenicator));
+
+        _transcoder = transcoder ??
+            throw new ArgumentNullException(nameof(transcoder));
 
         _httpClient = new HttpClient()
         {

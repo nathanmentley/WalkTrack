@@ -14,17 +14,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-using System.Text.Json.Nodes;
-using WalkTrack.Framework.Common.Json;
+using WalkTrack.AuthService.Client;
+using WalkTrack.AuthService.Common;
+using WalkTrack.Framework.Client.Exceptions;
 using WalkTrack.Framework.Common.Resources;
 
-namespace WalkTrack.AuthService.Common;
+namespace WalkTrack.Utils.DataSeeder.Loaders;
 
-/// <summary>
-/// </summary>
-internal sealed class CreateAuthRequestJsonV1Transcoder: BaseJsonTranscoder<CreateAuthRequest>, ITranscoder
+public sealed class AuthenticationDataLoader: BaseDataLoader<CreateAuthRequest>
 {
-    private static readonly WalkTrackMediaType _supportedMediaType =
+    protected override WalkTrackMediaType MediaType =>
         new WalkTrackMediaTypeBuilder()
             .WithType(WalkTrackMediaTypeTypes.Application)
             .WithSubType(WalkTrackMediaTypeSubTypes.Json)
@@ -32,21 +31,32 @@ internal sealed class CreateAuthRequestJsonV1Transcoder: BaseJsonTranscoder<Crea
             .WithVersion(1)
             .Build();
 
-    protected override WalkTrackMediaType GetSupportedMediaType() =>
-        _supportedMediaType;
+    protected override string Directory =>
+        "data/authentications";
 
-    public override JsonObject Encode(CreateAuthRequest resource) =>
-        new JsonObjectBuilder()
-            .With("username", resource.Username)
-            .With("password", resource.Password)
-            .With("rolename", resource.RoleName)
-            .Build();
+    private readonly IAuthenticationClient _authenticationClient;
 
-    public override CreateAuthRequest Decode(JsonObject jsonObject) =>
-        new CreateAuthRequest()
+    public AuthenticationDataLoader(
+        IAuthenticationClient authenticationClient,
+        ITranscoderProcessor transcoderProcessor
+    ):
+        base(transcoderProcessor)
+    {
+        _authenticationClient = authenticationClient ??
+            throw new ArgumentNullException(nameof(authenticationClient));
+    }
+
+    protected override async Task LoadRecord(
+        CreateAuthRequest record,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
         {
-            Username = GetValue(jsonObject, "username", string.Empty),
-            Password = GetValue(jsonObject, "password", string.Empty),
-            RoleName = GetValue(jsonObject, "rolename", string.Empty)
-        };
+            await _authenticationClient.Create(record, cancellationToken);
+        }
+        catch(UnhandledResponseErrorClientException)
+        {
+        }
+    }
 }

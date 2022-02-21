@@ -28,17 +28,4 @@ internal sealed class UserPresistedResource: BasePresistedResource
     internal string Username { get; init; } = string.Empty;
     internal string Email { get; init; } = string.Empty;
     internal bool IsPublic { get; init; } = false;
-    internal string Password { get; init; } = string.Empty;
-    internal string Salt { get; init; } = string.Empty;
-    internal string ResetToken { get; init; } = string.Empty;
-    private DateTime _resetTokenExpiresAt = MinSqlDataTime;
-    internal DateTime ResetTokenExpiresAt {
-        get => _resetTokenExpiresAt;
-        init {
-            _resetTokenExpiresAt =
-                value < MinSqlDataTime ?
-                    MinSqlDataTime:
-                    value;
-        }
-    }
 }

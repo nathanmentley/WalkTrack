@@ -22,7 +22,7 @@ using WalkTrack.Framework.Server.Hosting.Exceptions;
 namespace WalkTrack.AuthService.Server.Hosting.Controllers.Authentications;
 
 [ApiController]
-//[Authorize("TODO")]
+[Authorize("create-authentication")]
 [Route("v1/authentication")]
 public sealed class CreateAuthenticationV1Controller
 {

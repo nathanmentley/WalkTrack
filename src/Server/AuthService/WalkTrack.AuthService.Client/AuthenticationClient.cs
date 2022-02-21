@@ -18,19 +18,25 @@ using Flurl;
 using WalkTrack.Framework.Client;
 using WalkTrack.Framework.Common.Resources;
 using WalkTrack.AuthService.Common;
+using WalkTrack.Framework.Client.Authentications;
 
 namespace WalkTrack.AuthService.Client;
 
 internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, IDisposable
 {
+    private readonly IAuthenticator _authenicator;
     private readonly ITranscoderProcessor _transcoder;
     private readonly HttpClient _httpClient;
 
     public AuthenticationClient(
         string url,
+        IAuthenticator authenicator,
         ITranscoderProcessor transcoder
     )
     {
+        _authenicator = authenicator ??
+            throw new ArgumentNullException(nameof(authenicator));
+
         _transcoder = transcoder ??
             throw new ArgumentNullException(nameof(transcoder));
 
@@ -54,27 +60,10 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, I
                     .AppendPathSegment("authentication")
             )
             .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Send<CreateAuthRequest>(_httpClient, cancellationToken);
-
-    public async Task<AuthenticateResponse> Login(
-        AuthenticateRequest request,
-        CancellationToken cancellationToken = default
-    ) =>
-        await new RequestBuilder(_transcoder)
-            .WithBody(request)
-            .WithContentTypes(MediaTypes.AuthenticateRequest)
-            .WithMethod(HttpMethod.Post)
-            .WithUrl(
-                new Url()
-                    .AppendPathSegment("v1")
-                    .AppendPathSegment("authenticate")
-            )
-            .WithAcceptType(MediaTypes.AuthenticateResponse)
-            .WithAcceptType(MediaTypes.ApiError)
-            .WithErrorHandler(new ResourceNotFoundErrorHandler())
-            .Fetch<AuthenticateRequest, AuthenticateResponse>(_httpClient, cancellationToken);
 
     public async Task<Token> RefreshToken(
         Token request,
@@ -91,6 +80,7 @@ internal sealed class AuthenticationClient: BaseClient, IAuthenticationClient, I
             )
             .WithAcceptType(MediaTypes.Token)
             .WithAcceptType(MediaTypes.ApiError)
+            .WithAuthenticator(_authenicator)
             .WithErrorHandler(new ForbiddenErrorHandler())
             .WithErrorHandler(new UnauthorizedErrorHandler())
             .Fetch<Token, Token>(_httpClient, cancellationToken);
